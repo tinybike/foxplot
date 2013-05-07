@@ -6,31 +6,35 @@ The units of these should be based on the units defined above. And hopefully the
 
 (c) Jack Peterson (jack@tinybike.net), 5/5/2013
 """
-from __future__ import division
 from django.db import connection
 from numpy import percentile, mean, median
 
-def aggregated_stats(fields):
+def aggregated_stats(dataset, fields):
 	"""
 	Calculates statistics aggregated across years for npp_wet, gro, and
 	bio: gro and bio are monthly data, npp_wet is seasonal data.
 	"""
 	summary = {}
-	table = 'piedata'
-	year_label = 'yy'
-	month_label = 'mm'
-		
+	period_label = 'mm' if dataset == 'piedata' else 'season'
+	
 	# Find all unique months
-	cursor.execute("SELECT DISTINCT `%s` FROM %s" % (month_label, table))
-	months = [row[0] for row in cursor.fetchall()]
+	cursor.execute("SELECT DISTINCT `%s` FROM %s" % (period_label, dataset))
+	periods = [row[0] for row in cursor.fetchall()]
 	
 	for field in fields:
 		summary[field] = {}
-		for month in months:
-			cursor.execute(
-				"SELECT `%s` FROM %s WHERE `%s` = %i" 
-				% (field, table, month_label, int(month))
-			)
+		for period in periods:
+			if period_label == 'mm':
+				sql = (
+					"SELECT `%s` FROM %s WHERE `%s` = %i" 
+					% (field, dataset, period_label, int(period))
+				)
+			else:
+				sql = (
+					"SELECT `%s` FROM %s WHERE `%s` = '%s'" 
+					% (field, dataset, period_label, period)
+				)
+			cursor.execute(sql)
 			
 			# Adjust units for the npp_wet field, otherwise no adjustment is
 			# needed
@@ -38,7 +42,7 @@ def aggregated_stats(fields):
 			results = [row[0]*adjustment for row in cursor.fetchall()]
 			
 			# Calculate summary statistics
-			summary[field][month] = {
+			summary[field][period] = {
 				'min': min(results),
 				'quartile_1': percentile(results, 25),
 				'mean': mean(results),
@@ -48,16 +52,16 @@ def aggregated_stats(fields):
 			}
 	return summary
 
-def yearly_stats(table, fields):
+def yearly_stats(dataset, fields):
 	"""
 	Calculates yearly statistics (min, 1st quartile, mean, median, 3rd quartile,
 	max) for numerical data retrieved from the dataRonin database.
 	"""
 	summary = {}
-	year_label = 'yy' if table == 'piedata' else 'year'
+	year_label = 'yy' if dataset == 'piedata' else 'year'
 
 	# Find all unique years
-	cursor.execute("SELECT DISTINCT `%s` FROM %s" % (year_label, table))
+	cursor.execute("SELECT DISTINCT `%s` FROM %s" % (year_label, dataset))
 	years = [row[0] for row in cursor.fetchall()]
 
 	for field in fields:
@@ -65,7 +69,7 @@ def yearly_stats(table, fields):
 		for year in years:			
 			cursor.execute(
 				"SELECT `%s` FROM %s WHERE `%s` = %i" 
-				% (field, table, year_label, int(year))
+				% (field, dataset, year_label, int(year))
 			)
 
 			# Adjust units for for the npp_wet, bio_all, or anpp fields.
@@ -75,6 +79,7 @@ def yearly_stats(table, fields):
 			elif field == 'bio_all' or field == 'anpp':
 				adjustment = 0.01
 			else:
+				adjustment = 1
 			results = [row[0]*adjustment for row in cursor.fetchall()]
 
 			# Calculate summary statistics
@@ -114,8 +119,8 @@ cursor.execute("SELECT `year`, `bio_all`, `anpp` FROM hja_ws1_test")
 results = cursor.fetchall()
 data['hja_ws1_test'] = {
 	'year': [row[0] for row in results],
-	'bio_all': [row[1]/100 for row in results],
-	'anpp': [row[2]/100 for row in results],
+	'bio_all': [row[1]*0.01 for row in results],
+	'anpp': [row[2]*0.01 for row in results],
 }
 
 # Get yearly and aggregated summary statistics for numerical datasets
@@ -126,8 +131,8 @@ summary_stats['yearly'] = {
 	'pie': yearly_stats('piedata', ['gro', 'bio']),
 }
 summary_stats['aggregate'] = {
-	'kelp': aggregated_stats(['npp_wet']),
-	'pie': aggregated_stats(['gro', 'bio']),
+	'kelp': aggregated_stats('kelp_grow_npp', ['npp_wet']),
+	'pie': aggregated_stats('piedata', ['gro', 'bio']),
 }
 
 """
