@@ -1,28 +1,52 @@
 #!usr/bin/env python
 """
-PIE SPARTINA: “year” “mm” “gro” and “bio”
-SBC MACROCYSTIS: “year”,”season”,”NPP_wet”
-HJA PSUEDOTSUGA: “year”,” bio_all” and “ANPP”
-
-Divide by 100 for the bio_all.
-Divide by 100 for the “ANPP”.
-Multiply by 3650 for the “NPP_wet”.
-
-Each “season” has a length of “3 month.”
-
-Okay, so for the columns of “bio”, “bio_all”, “gro”, “NPP_wet” and “ANPP”, the first function I need the script to do is to output a little table of summary statistics. For “bio_all” and “ANPP” the scale I need is yearly. For example.
-
-Bio in 2007: 1st quartile, mean, median, 3rd quartile, max, min, standard deviation
-
-ANPP in 1988: 1st quartile, mean, median, etc..
-
 For “NPP_wet” and “gro” and “bio” those same statistics, but calculated both on the scale of 1 year (so for each year, those measurements, for example: gro in 1999 1st quartile, mean, median etc., gro in 2000 1st quartile, mean, median, etc. as well as for “gro” for each month, but aggregated across years, for example, gro in all Januaries mean, median, etc., gro in all Julys, etc. For the “NPP_wet” the same idea, but for each season, so “NPP_wet in autumns” etc.
 
 The units of these should be based on the units defined above. And hopefully the tables look kind of nice too.
+
+(c) Jack Peterson (jack@tinybike.net), 5/5/2013
 """
 from __future__ import division
 from django.db import connection
-import numpy as np
+from numpy import percentile, mean, median
+
+def aggregated_stats(fields):
+	"""
+	Calculates statistics aggregated across years for npp_wet, gro, and
+	bio: gro and bio are monthly data, npp_wet is seasonal data.
+	"""
+	summary = {}
+	table = 'piedata'
+	year_label = 'yy'
+	month_label = 'mm'
+		
+	# Find all unique months
+	cursor.execute("SELECT DISTINCT `%s` FROM %s" % (month_label, table))
+	months = [row[0] for row in cursor.fetchall()]
+	
+	for field in fields:
+		summary[field] = {}
+		for month in months:
+			cursor.execute(
+				"SELECT `%s` FROM %s WHERE `%s` = %i" 
+				% (field, table, month_label, int(month))
+			)
+			
+			# Adjust units for the npp_wet field, otherwise no adjustment is
+			# needed
+			adjustment = 3650 if field == 'npp_wet' else 1
+			results = [row[0]*adjustment for row in cursor.fetchall()]
+			
+			# Calculate summary statistics
+			summary[field][month] = {
+				'min': min(results),
+				'quartile_1': percentile(results, 25),
+				'mean': mean(results),
+				'median': median(results),
+				'quartile_3': percentile(results, 75),
+				'max': max(results),
+			}
+	return summary
 
 def yearly_stats(table, fields):
 	"""
@@ -31,7 +55,11 @@ def yearly_stats(table, fields):
 	"""
 	summary = {}
 	year_label = 'yy' if table == 'piedata' else 'year'
-	years = np.unique(data[table][year_label])
+
+	# Find all unique years
+	cursor.execute("SELECT DISTINCT `%s` FROM %s" % (year_label, table))
+	years = [row[0] for row in cursor.fetchall()]
+
 	for field in fields:
 		summary[field] = {}
 		for year in years:			
@@ -39,13 +67,23 @@ def yearly_stats(table, fields):
 				"SELECT `%s` FROM %s WHERE `%s` = %i" 
 				% (field, table, year_label, int(year))
 			)
-			results = [row[0] for row in cursor.fetchall()]
+
+			# Adjust units for for the npp_wet, bio_all, or anpp fields.
+			# Otherwise, no adjustment is needed.
+			if field == 'npp_wet':
+				adjustment = 3650
+			elif field == 'bio_all' or field == 'anpp':
+				adjustment = 0.01
+			else:
+			results = [row[0]*adjustment for row in cursor.fetchall()]
+
+			# Calculate summary statistics
 			summary[field][year] = {
 				'min': min(results),
-				'quartile_1': np.percentile(results, 25),
-				'mean': np.mean(results),
-				'median': np.median(results),
-				'quartile_3': np.percentile(results, 75),
+				'quartile_1': percentile(results, 25),
+				'mean': mean(results),
+				'median': median(results),
+				'quartile_3': percentile(results, 75),
 				'max': max(results),
 			}
 	return summary
@@ -80,11 +118,16 @@ data['hja_ws1_test'] = {
 	'anpp': [row[2]/100 for row in results],
 }
 
-# Get yearly summary statistics for numerical datasets
-summary = {
+# Get yearly and aggregated summary statistics for numerical datasets
+summary_stats = {}
+summary_stats['yearly'] = {
 	'hja': yearly_stats('hja_ws1_test', ['bio_all', 'anpp']),
 	'kelp': yearly_stats('kelp_grow_npp', ['npp_wet']),
 	'pie': yearly_stats('piedata', ['gro', 'bio']),
+}
+summary_stats['aggregate'] = {
+	'kelp': aggregated_stats(['npp_wet']),
+	'pie': aggregated_stats(['gro', 'bio']),
 }
 
 """
