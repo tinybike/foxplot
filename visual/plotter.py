@@ -18,7 +18,7 @@ class Plotter:
 
 	def summary_stats(self):
 		"""
-		Calculate and return summary statistics dict.
+		Calculate summary statistics and place into dictionary.
 		"""
 		# Get yearly and aggregated summary statistics for numerical datasets
 		self.yearly_stats('hja_ws1_test', ['bio_all', 'anpp'])
