@@ -58,16 +58,69 @@
 	<div id="page" class="container">
 		<div id="content">
 			<div class="post">
-				<form action="/visual/" method="post">
-				<ul>
-					{% csrf_token %}
-					<li><input type="text" name="scrape_url" id="scrape_url" size="25" placeholder="Enter search text..." /></li>
-					<li><input type="submit" value="Go" /></li>
-				</ul>
-				</form>
+				<p class="announce">Retrieved HTML from <a href="{{ scrape_url }}">{{ scrape_url }}</a></p>
+
+				<div id="raw_html">
+					<pre>{{ pieces.html }}</pre>
+				</div>
+
+				{% if user_specified_tag %}
+					<p>Found {{ num_found_tags }} <code>&lt;{{ user_specified_tag }}&gt;</code> tag{{ num_found_tags|pluralize }}:</p>
+					<div id="tag_search_results">
+					{% for tag in found_tags %}
+						<ul>
+						<li><code>{{ tag }}</code></li>
+						</ul>
+					{% empty %}
+						<p>Tag not found!</p>
+					{% endfor %}
+					</div>
+				{% endif %}
+				
+				{% if user_specified_text %}
+					<p>Found {{ num_found_text }} instance{{ num_found_text|pluralize}} of <code>{{ user_specified_text }}</code>:</p>
+					<div id="text_search_results">
+					{% for text in found_text %}
+						<ul>
+						<li><code>{{ text }}</code></li>
+						</ul>
+					{% empty %}
+						<p>Text not found!</p>
+					{% endfor %}
+					</div>
+				{% endif %}
+				
+				<div id="shatter">
+					<table>
+					<tr>
+					<th>Name</th>
+					<th>Attributes</th>
+					<th>Content</th>
+					</tr>
+					{% for tag, attrs, string in glued %}
+						<tr>
+						<td><code>{{ tag }}</code></td>
+						<td>
+						{% if attrs %}
+							<ul>
+							<div class="shatter_container">
+							{% for attr in attrs %}
+								<li><code>{{ attr }}</code></li>
+							{% endfor %}
+							</div>
+							</ul>
+						{% endif %}
+						</td>
+						<td><code>{{ string|slice:":255" }}</code></td>
+						</tr>
+					{% endfor %}
+					</table>
+				</div>
+
 			</div>
 			<div style="clear: both;">&nbsp;</div>
 		</div>
+
 		<div id="sidebar">
 			<a href="#"><img src="{% static 'visual/images/fox_fb.jpg' %}" alt="Fox Peterson" /></a>
 		</div>

@@ -178,7 +178,7 @@ class Plotter:
 		
 	def get_histogram(self, dataset, field):
 		"""
-		Histograms of “bio” and “bio_all” with % on the Y and “g/m2” on the X. It also needs to be able to over lay these two on top of one another, which means that it will probably be log g/m2 on the X to be meaningful. There will be more measurements of the “bio_all” than the “bio” but that is okay, there would just be “skinnier bars”. On these bars should also be error bars the size of the standard deviation.  (NOTE: What is std dev here??)
+		Create and return histogram for specified dataset and field.
 		"""
 		counts, bin_edges = histogram(
 			self.data[dataset][field], bins=self.num_bins
@@ -191,9 +191,8 @@ class Plotter:
 
 	def get_time_series(self, dataset, field, align=True):
 		"""
-		Time trajectories of “bio” and “bio_all,” also possible to be overlaid, and in 2 ways. (1) so that the “years” line up (so in this case there would not be much overlap) and (2) so that they both “start” at the same time, but the years do not line up, rather just the time since the “start” lines up. There will be more measurements of the “bio all” than the “bio” in both cases but that is okay,  and the time trajectories should be essentially “errorbars” of height “standard deviation” connected by solid lines.
-		
-		So that would be like month/year on the X and raw values (or log transformed values) of bio and bio_all on the y
+		Return time series, aggregated by year.  User specifies whether the
+		overlay is aligned or not.
 		"""
 		# Verify the ordering in the dict is correct!
 		self.time_series['year'] = \
