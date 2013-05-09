@@ -7,6 +7,7 @@ Statistics and plotting tools for dataRonin ecological time-series data.
 from __future__ import division
 from django.db import connection
 from numpy import percentile, mean, median, std, histogram
+from collections import OrderedDict
 #from matplotlib import pyplot
 
 class Plotter:
@@ -18,13 +19,9 @@ class Plotter:
 
 	def summary_stats(self):
 		"""
-		Calculate summary statistics and place into dictionary.
+		Get yearly and aggregated summary statistics for numerical fields, 
+		then place into dictionary.
 		"""
-		# Get yearly and aggregated summary statistics for numerical datasets
-		self.yearly_stats('hja_ws1_test', ['bio_all', 'anpp'])
-		self.yearly_stats('kelp_grow_npp', ['npp_wet'])
-		self.yearly_stats('piedata', ['gro', 'bio'])
-		
 		self.summary['yearly'] = {
 			'hja_ws1_test': self.yearly_stats('hja_ws1_test', ['bio_all', 'anpp']),
 			'kelp_grow_npp': self.yearly_stats('kelp_grow_npp', ['npp_wet']),
@@ -48,7 +45,7 @@ class Plotter:
 		periods = [row[0] for row in self.cursor.fetchall()]
 		
 		for field in fields:
-			summary[field] = {}
+			summary[field] = OrderedDict()
 			for period in periods:
 				if period_label == 'mm':
 					sql = (
@@ -92,8 +89,8 @@ class Plotter:
 		years = [row[0] for row in self.cursor.fetchall()]
 
 		for field in fields:
-			summary[field] = {}
-			for year in years:	
+			summary[field] = OrderedDict()
+			for year in years:
 				self.cursor.execute(
 					"SELECT `%s` FROM %s WHERE `%s` = %i" 
 					% (field, dataset, year_label, int(year))
@@ -194,14 +191,13 @@ class Plotter:
 		Return time series, aggregated by year.  User specifies whether the
 		overlay is aligned or not.
 		"""
-		# Verify the ordering in the dict is correct!
 		time_series = {}
 		time_series['year'] = \
 			[year for year in self.summary['yearly'][dataset][field]]
 		for stat in ['mean', 'std']:
 			time_series[stat] = [
 				self.summary['yearly'][dataset][field][year][stat] for year in \
-				self.summary['yearly'][dataset][field]
+					self.summary['yearly'][dataset][field]
 			]
 		return time_series
 		

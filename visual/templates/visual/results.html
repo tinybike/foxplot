@@ -15,6 +15,8 @@
 <script>
 $(function() {
 	var timeSeries = [];
+	var plusRange = [];
+	var minusRange = [];
 	var jsonTimeSeries = {{ json_time_series|safe }};
 	
 	var timeSeries_points = {
@@ -26,8 +28,26 @@ $(function() {
 	
 	{% for year, value, error_bar in time_series %}
 		timeSeries.push([{{ year }}, {{ value }}, {{ error_bar }}]);
+		plusRange.push({{ value }} + {{ error_bar }});
+		minusRange.push({{ value }} - {{ error_bar }});
 	{% endfor %}
-	
+		
+	// Add some space to the top and bottom of the time series plot, and make
+	// sure the margins are symmetric
+	plusRange.sort();
+	minusRange.sort();
+	var yMin = (minusRange[0] > 0) ? minusRange[0] / 1.1 : minusRange[0] * 1.1;
+	var yMax = (plusRange.slice(-1)[0] > 0) ? plusRange.slice(-1)[0] * 1.1 : 
+		plusRange.slice(-1)[0] / 1.1;
+	plusDiff = Math.abs(plusRange.slice(-1)[0] - yMax);
+	minusDiff = Math.abs(minusRange[0] - yMin);
+	if (plusDiff > minusDiff) {
+		yMin = minusRange[0] - plusDiff;
+	}
+	else {
+		yMax = plusRange.slice(-1)[0] + minusDiff;
+	}
+		
 	var data = [
 		{
 			data: timeSeries,
@@ -56,8 +76,8 @@ $(function() {
 				axisLabelUseCanvas: false
 			},
 			yaxis: {
-				axisLabel: 'Value',
-				axisLabelUseCanvas: true
+				min: yMin,
+				max: yMax
 			}
 		});
 		
@@ -119,12 +139,8 @@ $(function() {
 				hoverable: true,
 				clickable: true
 			},
-			xaxis: {
-				axisLabel: 'Bin',
-				axisLabelUseCanvas: false
-			},
 			yaxis: {
-				axisLabel: 'Percent',
+				axisLabel: '%',
 				axisLabelUseCanvas: true
 			}
 		});
@@ -142,7 +158,7 @@ $(function() {
 			opacity: 0.80
 		}).appendTo("body").fadeIn(200);
 	}
-
+	
 	var previousPoint = null;
 	$("#histogram_placeholder").bind("plothover", function (event, pos, item) {		
 		if (item) {
@@ -232,8 +248,8 @@ $(function() {
 					</select>
 				</li>
 				<li><input type="checkbox" value="Yes" name="get_summary" id="get_summary" />Get summary statistics</li>
-				<li><input type="checkbox" value="Yes" name="get_histogram" id="get_histogram" />Get histogram</li>
-				<li><input type="checkbox" value="Yes" name="get_time_series" id="get_time_series" />Get time series</li>
+				<li><input type="checkbox" value="Yes" name="get_histogram" id="get_histogram" checked="checked" />Get histogram</li>
+				<li><input type="checkbox" value="Yes" name="get_time_series" id="get_time_series" checked="checked" />Get time series</li>
 				<li><input type="submit" value="Fetch" /></li>
 			</ul>
 			</form>

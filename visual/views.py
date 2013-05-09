@@ -39,6 +39,12 @@ def results(request):
 		P.time_series[dataset]['std']
 	)
 	
+	json_time_series = {}
+	for field in ['bio', 'gro', 'bio_all', 'npp_wet', 'anpp']:
+		data = zip(P.time_series[field]['year'], P.time_series[field]['mean'])
+		data = [list(j) for j in data]
+		json_time_series[field] = {'label': field, 'data': data}
+	
 	return render(request, 'visual/results.html', {
 		'dataset': dataset,
 		'table': table,
@@ -49,7 +55,7 @@ def results(request):
 		'num_bins': P.num_bins,
 		'histogram': histogram,
 		'time_series': time_series,
-		'json_time_series': json.dumps(P.time_series),
+		'json_time_series': json.dumps(json_time_series),
 		'data': P.data,
 	})
 
