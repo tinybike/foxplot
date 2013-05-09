@@ -53,10 +53,11 @@ $(function() {
 				grid: {
 					color: "white",
 					borderWidth: 1,
-					borderColor: "#ccc",
+					borderColor: "#777",
 					markingsColor: "white"
 				},
 				legend: {
+					position: "nw",
 					backgroundOpacity: 0.15
 				}
 			});
@@ -283,7 +284,7 @@ $(function() {
 			<form action="/visual/results/" method="post">
 			<ul>
 				{% csrf_token %}
-				<li>
+				<!---<li>
 					Dataset:
 					<select name="dataset" id="dataset">
 						<option value="bio">bio</option>
@@ -292,23 +293,24 @@ $(function() {
 						<option value="anpp">anpp</option>
 						<option value="npp_wet">npp_wet</option>
 					</select>
-				</li>
+				</li>--->
 				<li><input type="checkbox" value="Yes" name="get_summary" id="get_summary" />Get summary statistics</li>
 				<li><input type="checkbox" value="Yes" name="get_histogram" id="get_histogram" checked="checked" />Get histogram</li>
 				<li><input type="checkbox" value="Yes" name="get_time_series" id="get_time_series" checked="checked" />Get time series</li>
+				<li><input type="checkbox" value="Yes" name="log_y" id="log_y" checked="checked" />Log-transform time series</li>
 				<li><input type="submit" value="Fetch" /></li>
 			</ul>
 			</form>
 		</div>
 		<div id="plotter">
-			{% if get_summary %}
+			<!---{% if get_summary %}
 				<p class="announce">Summary statistics</p>
 				<ul>
 				{% for stat, value in summary %}
 					<li>{{ stat }}: {{ value }}</li>
 				{% endfor %}
 				</ul>
-			{% endif %}
+			{% endif %}--->
 			{% if get_time_series %}
 				<p class="announce">Time series</p>
 				<div class="flot-container">

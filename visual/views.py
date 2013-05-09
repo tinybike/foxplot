@@ -11,27 +11,28 @@ from math import log
 
 def results(request):
 	
-	dataset = request.POST['dataset']
-	get_summary = True if 'get_summary' in request.POST.keys() else False
+	#dataset = request.POST['dataset']
+	#get_summary = True if 'get_summary' in request.POST.keys() else False
 	get_histogram = True if 'get_histogram' in request.POST.keys() else False
 	get_time_series = True if 'get_time_series' in request.POST.keys() else False
+	log_y = True if 'log_y' in request.POST.keys() else False
 
-	if dataset == 'bio' or dataset == 'gro':
-		table = 'piedata'
-	elif dataset == 'bio_all':
-		table = 'hja_ws1_test'
-	else:
-		table = 'kelp_grow_npp'
+	#if dataset == 'bio' or dataset == 'gro':
+	#	table = 'piedata'
+	#elif dataset == 'bio_all':
+	#	table = 'hja_ws1_test'
+	#else:
+	#	table = 'kelp_grow_npp'
 	
 	P = Plotter()
 	P.summary_stats()
 	P.fetch_data()
 	P.make_plots()
 	
-	summary = zip(
-		P.summary['yearly'][table][dataset][2007].keys(), 
-		P.summary['yearly'][table][dataset][2007].values()
-	)
+	#summary = zip(
+	#	P.summary['yearly'][table][dataset][2007].keys(), 
+	#	P.summary['yearly'][table][dataset][2007].values()
+	#)
 	histogram = zip(P.hist['bin'][dataset], P.hist['percent'][dataset])
 	
 	time_series = zip(
@@ -42,9 +43,12 @@ def results(request):
 	
 	json_time_series = {}
 	for field in ['bio', 'gro', 'bio_all', 'npp_wet', 'anpp']:
-		log_y = [log(j+0.0001) for j in P.time_series[field]['mean']]
+		if log_y:
+			values = [None if j == 0 else log(j) for j in P.time_series[field]['mean']]
+		else:
+			values = P.time_series[field]['mean']
 		data = zip(
-			P.time_series[field]['year'], log_y
+			P.time_series[field]['year'], values
 		)
 		data = [list(j) for j in data]
 		json_time_series[field] = {'label': field, 'data': data}
@@ -55,7 +59,7 @@ def results(request):
 		'get_summary': get_summary,
 		'get_histogram': get_histogram,
 		'get_time_series': get_time_series,
-		'summary': summary,
+		#'summary': summary,
 		'num_bins': P.num_bins,
 		'histogram': histogram,
 		'time_series': time_series,
