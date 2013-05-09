@@ -7,6 +7,7 @@ try:
 	import json
 except ImportError:
 	import simplejson as json
+from math import log
 
 def results(request):
 	
@@ -41,7 +42,10 @@ def results(request):
 	
 	json_time_series = {}
 	for field in ['bio', 'gro', 'bio_all', 'npp_wet', 'anpp']:
-		data = zip(P.time_series[field]['year'], P.time_series[field]['mean'])
+		log_y = [log(j+0.0001) for j in P.time_series[field]['mean']]
+		data = zip(
+			P.time_series[field]['year'], log_y
+		)
 		data = [list(j) for j in data]
 		json_time_series[field] = {'label': field, 'data': data}
 	
