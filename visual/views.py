@@ -27,9 +27,11 @@ def results(request):
 		P.summary['yearly'][table][dataset][2007].keys(), 
 		P.summary['yearly'][table][dataset][2007].values()
 	)
-	
 	histogram = zip(P.hist['bin'][dataset], P.hist['percent'][dataset])
-	time_series = zip(P.time_series
+	time_series = zip(
+		P.time_series[dataset]['year'],
+		P.time_series[dataset]['mean']
+	)
 	
 	return render(request, 'visual/results.html', {
 		'dataset': dataset,
@@ -40,7 +42,7 @@ def results(request):
 		'summary': zipped_summary,
 		'num_bins': P.num_bins,
 		'histogram': histogram,
-		'time_series': P.time_series,
+		'time_series': time_series,
 		'data': P.data,
 	})
 

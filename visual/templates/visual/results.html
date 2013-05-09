@@ -9,18 +9,19 @@
 <meta name="description" content="" />
 <script src="{% static 'visual/js/jquery.js' %}"></script>
 <script src="{% static 'visual/js/jquery.flot.js' %}"></script>
+<script src="{% static 'visual/js/jquery.flot.axislabels.js' %}"></script>
 <script>
 $(function() {
-	var d1 = [];
+	var timeSeries = [];
 	
-	{% for bin, percent in histogram %}
-		d1.push([{{ bin }}, {{ percent }}]);
+	{% for year, value in time_series %}
+		timeSeries.push([{{ year }}, {{ value }}]);
 	{% endfor %}
 
 	$.plot('#placeholder', [d1]);
 	
 	var plot = $.plot("#placeholder", [
-			{ data: d1, label: "{{ dataset }}"}
+			{ data: timeSeries, label: "{{ dataset }}"}
 		], {
 			series: {
 				lines: {
@@ -33,6 +34,14 @@ $(function() {
 			grid: {
 				hoverable: true,
 				clickable: true
+			},
+			xaxis: {
+				axisLabel: 'Year',
+				axisLabelUseCanvas: false
+			},
+			yaxis: {
+				axisLabel: 'Value',
+				axisLabelUseCanvas: true
 			}
 		});
 		
@@ -154,8 +163,8 @@ $(function() {
 				{% endfor %}
 				</ul>
 			{% endif %}
-			{% if get_histogram %}
-				<p class="announce">Histogram</p>
+			{% if get_time_series %}
+				<p class="announce">Time series</p>
 				<div class="flot-container">
 					<div id="placeholder" class="flot-placeholder"></div>
 				</div>
