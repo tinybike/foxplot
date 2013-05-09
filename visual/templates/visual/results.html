@@ -74,6 +74,9 @@ $(function() {
 					axisLabel: 'Year',
 					axisLabelUseCanvas: false
 				},
+				yaxis: {
+					position: "right"
+				},
 				grid: {
 					color: "white",
 					borderWidth: 1,
@@ -297,6 +300,10 @@ $(function() {
 					axisLabel: '%',
 					axisLabelUseCanvas: false
 				},
+				xaxis: {
+					axisLabel: 'Value',
+					axisLabelUseCanvas: false
+				},
 				legend: {
 					position: "ne",
 					backgroundOpacity: 0.15
@@ -430,14 +437,9 @@ $(function() {
 			{% if get_time_series %}
 				<!---<p class="announce">Time series</p>--->
 				<div class="flot-container">
+					<div id="histogram_placeholder" class="flot-placeholder"></div>
 					<div id="time_series_placeholder" class="flot-placeholder"></div>
 					<p id="choices" style="float:right; width:135px;"></p>
-				</div>
-			{% endif %}
-			{% if get_histogram %}
-				<!---<p class="announce">Histogram</p>--->
-				<div class="flot-container">
-					<div id="histogram_placeholder" class="flot-placeholder"></div>
 				</div>
 			{% endif %}
 		</div>
