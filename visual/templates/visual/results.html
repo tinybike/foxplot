@@ -195,6 +195,7 @@ $(function() {
 });
 
 $(function() {
+	/*
 	var histogram = [];
 	
 	{% for bin, percent in histogram %}
@@ -232,6 +233,94 @@ $(function() {
 		}).appendTo("body").fadeIn(200);
 	}
 	
+	var previousPoint = null;
+	$("#histogram_placeholder").bind("plothover", function (event, pos, item) {		
+		if (item) {
+			if (previousPoint != item.dataIndex) {
+				previousPoint = item.dataIndex;
+				$("#tooltip").remove();
+				var x = item.datapoint[0].toFixed(2),
+				y = item.datapoint[1].toFixed(2);
+				showTooltip(item.pageX, item.pageY,
+					y + "% chance of " + item.series.label + " = " + x);
+			}
+		} else {
+			$("#tooltip").remove();
+			previousPoint = null;            
+		}
+	});
+
+	$("#histogram_placeholder").bind("plotclick", function (event, pos, item) {
+		if (item) {
+			$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
+			plot.highlight(item.series, item.datapoint);
+		}
+	});*/
+	
+	var datasets = {{ json_histogram|safe }};
+	
+	// Hard-code color indices (to prevent them from shifting)
+	var i = 0;
+	$.each(datasets, function(key, val) {
+		val.color = i;
+		++i;
+	});
+	
+	// Create dataset checkboxes
+	var choiceContainer = $("#choices");
+	
+	choiceContainer.find("input").click(plotAccordingToChoices);
+	
+	function plotAccordingToChoices() {
+		var data = [];
+		choiceContainer.find("input:checked").each(function () {
+			var key = $(this).attr("name");
+			if (key && datasets[key]) {
+				data.push(datasets[key]);
+			}
+		});
+		if (data.length > 0) {
+			$.plot("#histogram_placeholder", data, {
+				bars: {
+					show: true,
+					barWidth: 10 //histogram[1][0] - histogram[0][0]
+				},
+				grid: {
+					color: "white",
+					borderWidth: 1,
+					borderColor: "#777",
+					markingsColor: "white",
+					hoverable: true,
+					clickable: true
+				},
+				yaxis: {
+					axisLabel: '%',
+					axisLabelUseCanvas: false
+				},
+				legend: {
+					position: "ne",
+					backgroundOpacity: 0.15
+				}
+			});
+		}
+	}
+	
+	plotAccordingToChoices();
+	
+	function showTooltip(x, y, contents) {
+		$("<div id='tooltip'>" + contents + "</div>").css({
+			position: "absolute",
+			display: "none",
+			top: y - 25,
+			left: x + 5,
+			border: "1px solid #ccc",
+			padding: "2px",
+			"background-color": "#fff",
+			color: "#000",
+			opacity: 0.70
+		}).appendTo("body").fadeIn(200);
+	}
+
 	var previousPoint = null;
 	$("#histogram_placeholder").bind("plothover", function (event, pos, item) {		
 		if (item) {
