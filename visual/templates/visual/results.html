@@ -29,12 +29,11 @@ $(function() {
 	// Create dataset checkboxes
 	var choiceContainer = $("#choices");
 	$.each(datasets, function(key, val) {
-		choiceContainer.append("<br/><input type='checkbox' name='" + key +
+		choiceContainer.append("<li><input type='checkbox' name='" + key +
 			"' checked='checked' id='id" + key + "'></input>" +
 			"<label for='id" + key + "'> "
-			+ val.label + "</label>");
+			+ val.label + "</label></li>");
 	});
-	
 	choiceContainer.find("input").click(plotAccordingToChoices);
 	
 	{% if show_errors and not log_y  %}
@@ -425,6 +424,9 @@ $(function() {
 			</ul>
 			</form>
 		</div>
+		<div id="choices">
+		<p class="boxheader">Show dataset</p>
+		</div>
 		<div id="plotter">
 			<!---{% if get_summary %}
 				<p class="announce">Summary statistics</p>
@@ -439,7 +441,6 @@ $(function() {
 				<div class="flot-container">
 					<div id="histogram_placeholder" class="flot-placeholder"></div>
 					<div id="time_series_placeholder" class="flot-placeholder"></div>
-					<p id="choices" style="float:right; width:135px;"></p>
 				</div>
 			{% endif %}
 		</div>
