@@ -5,7 +5,43 @@ from django.utils import timezone
 from plotter import Plotter
 
 def results(request):
-	return render(request, 'visual/results.html')
+	
+	dataset = request.POST['dataset']
+	get_summary = True if 'get_summary' in request.POST.keys() else False
+	get_histogram = True if 'get_histogram' in request.POST.keys() else False
+	get_time_series = True if 'get_time_series' in request.POST.keys() else False
+
+	if dataset == 'bio' or dataset == 'gro':
+		table = 'piedata'
+	elif dataset == 'bio_all':
+		table = 'hja_ws1_test'
+	else:
+		table = 'kelp_grow_npp'
+	
+	P = Plotter()
+	P.summary_stats()
+	P.fetch_data()
+	P.make_plots()
+	
+	zipped_summary = zip(
+		P.summary['yearly'][table][dataset][2007].keys(), 
+		P.summary['yearly'][table][dataset][2007].values()
+	)
+	
+	histogram = zip(P.hist['bin'][dataset], P.hist['percent'][dataset])
+	
+	return render(request, 'visual/results.html', {
+		'dataset': dataset,
+		'table': table,
+		'get_summary': get_summary,
+		'get_histogram': get_histogram,
+		'get_time_series': get_time_series,
+		'summary': zipped_summary,
+		'num_bins': P.num_bins,
+		'hist': P.hist,
+		'time_series': P.time_series,
+		'data': P.data,
+	})
 
 def index(request):
 	return render(request, 'visual/index.html')

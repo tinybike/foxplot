@@ -55,22 +55,29 @@
 		</div>
 	</div>
 	<div id="banner-wrapper"></div>
-	<div id="page" class="container">
-		<div id="content">
-			<div class="post">
-				<form action="/visual/" method="post">
-				<ul>
-					{% csrf_token %}
-					<li><input type="text" name="scrape_url" id="scrape_url" size="25" placeholder="Enter search text..." /></li>
-					<li><input type="submit" value="Go" /></li>
-				</ul>
-				</form>
-			</div>
-			<div style="clear: both;">&nbsp;</div>
+	<div id="plotter_page" class="container">
+		<div id="leftbar">
+			<form action="/visual/results/" method="post">
+			<ul>
+				{% csrf_token %}
+				<li>
+					Dataset:
+					<select name="dataset" id="dataset">
+						<option value="bio">bio</option>
+						<option value="bio_all">bio_all</option>
+						<option value="gro">gro</option>
+						<option value="anpp">anpp</option>
+						<option value="npp_wet">npp_wet</option>
+					</select>
+				</li>
+				<li><input type="checkbox" value="Yes" name="get_summary" id="get_summary" />Get summary statistics</li>
+				<li><input type="checkbox" value="Yes" name="get_histogram" id="get_histogram" />Get histogram</li>
+				<li><input type="checkbox" value="Yes" name="get_time_series" id="get_time_series" />Get time series</li>
+				<li><input type="submit" value="Fetch" /></li>
+			</ul>
+			</form>
 		</div>
-		<div id="sidebar">
-			<a href="#"><img src="{% static 'visual/images/fox_fb.jpg' %}" alt="Fox Peterson" /></a>
-		</div>
+		<div id="plotter"></div>
 	</div>
 	<div class="push"></div>
 </div>
