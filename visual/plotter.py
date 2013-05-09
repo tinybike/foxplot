@@ -195,14 +195,15 @@ class Plotter:
 		overlay is aligned or not.
 		"""
 		# Verify the ordering in the dict is correct!
-		self.time_series['year'] = \
+		time_series = {}
+		time_series['year'] = \
 			[year for year in self.summary['yearly'][dataset][field]]
 		for stat in ['mean', 'std']:
-			self.time_series[stat] = [
+			time_series[stat] = [
 				self.summary['yearly'][dataset][field][year][stat] for year in \
 				self.summary['yearly'][dataset][field]
 			]
-		return self.time_series
+		return time_series
 		
 #pyplot.hist(data['hja_ws1_test']['bio_all'], bins=num_bins)
 #pyplot.show()

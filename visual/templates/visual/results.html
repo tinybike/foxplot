@@ -7,6 +7,74 @@
 <title>dataRonin</title>
 <meta name="keywords" content="" />
 <meta name="description" content="" />
+<script src="{% static 'visual/js/jquery.js' %}"></script>
+<script src="{% static 'visual/js/jquery.flot.js' %}"></script>
+<script>
+$(function() {
+	var d1 = [];
+	
+	{% for bin, percent in histogram %}
+		d1.push([{{ bin }}, {{ percent }}]);
+	{% endfor %}
+
+	$.plot('#placeholder', [d1]);
+	
+	var plot = $.plot("#placeholder", [
+			{ data: d1, label: "{{ dataset }}"}
+		], {
+			series: {
+				lines: {
+					show: true
+				},
+				points: {
+					show: true
+				}
+			},
+			grid: {
+				hoverable: true,
+				clickable: true
+			}
+		});
+		
+	function showTooltip(x, y, contents) {
+		$("<div id='tooltip'>" + contents + "</div>").css({
+			position: "absolute",
+			display: "none",
+			top: y - 25,
+			left: x + 5,
+			border: "1px solid #ccc",
+			padding: "2px",
+			"background-color": "#fff",
+			color: "#000",
+			opacity: 0.80
+		}).appendTo("body").fadeIn(200);
+	}
+
+	var previousPoint = null;
+	$("#placeholder").bind("plothover", function (event, pos, item) {		
+		if (item) {
+			if (previousPoint != item.dataIndex) {
+				previousPoint = item.dataIndex;
+				$("#tooltip").remove();
+				var x = item.datapoint[0].toFixed(2),
+				y = item.datapoint[1].toFixed(2);
+				showTooltip(item.pageX, item.pageY,
+					item.series.label + " of " + x + " = " + y);
+			}
+		} else {
+			$("#tooltip").remove();
+			previousPoint = null;            
+		}
+	});
+
+	$("#placeholder").bind("plotclick", function (event, pos, item) {
+		if (item) {
+			$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
+			plot.highlight(item.series, item.datapoint);
+		}
+	});
+});
+</script>
 <!---<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700|Archivo+Narrow:400,700" />--->
 <link rel="stylesheet" type="text/css" href="{% static 'visual/style.css' %}" />
 </head>
@@ -88,7 +156,34 @@
 			{% endif %}
 			{% if get_histogram %}
 				<p class="announce">Histogram</p>
-				{{ hist }}
+				<div class="flot-container">
+					<div id="placeholder" class="flot-placeholder"></div>
+				</div>
+				<!---<script src="https://www.google.com/jsapi"></script>
+				<script>
+				google.load('visualization', '1.0', {'packages':['corechart']});
+				google.setOnLoadCallback(drawChart);     
+				function drawChart() {
+					var dataArray = new Array();
+					dataArray[0] = ['x', 'y'];
+					var x;
+					var y;
+					{% for bin, percent in histogram %}
+						x.push({{ bin }});
+						y.push({{ percent }});
+					{% endfor %}
+					for(ii = 1; ii <= num_bins; ii++) {
+						dataArray[ii] = new Array(2);
+						dataArray[ii][0] = x[ii-1];
+						dataArray[ii][1] = parseFloat(y[ii-1]);
+					}
+					var data = google.visualization.arrayToDataTable(dataArray);
+					var options = {hAxis: {title:'Bin',logScale: 0}, vAxis: {title:'Probability (%)',logScale: 0}};
+					var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+					chart.draw(data, options);
+				}
+				</script>
+				<div id="chart_div"></div>--->
 			{% endif %}
 			<p class="announce">Data dump</p>
 			<div id="data_dump">

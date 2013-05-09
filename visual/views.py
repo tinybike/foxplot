@@ -29,6 +29,7 @@ def results(request):
 	)
 	
 	histogram = zip(P.hist['bin'][dataset], P.hist['percent'][dataset])
+	time_series = zip(P.time_series
 	
 	return render(request, 'visual/results.html', {
 		'dataset': dataset,
@@ -38,7 +39,7 @@ def results(request):
 		'get_time_series': get_time_series,
 		'summary': zipped_summary,
 		'num_bins': P.num_bins,
-		'hist': P.hist,
+		'histogram': histogram,
 		'time_series': P.time_series,
 		'data': P.data,
 	})
