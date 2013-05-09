@@ -26,7 +26,7 @@ $(function() {
 		++i;
 	});
 	
-	// Create dataset checkboxes 
+	// Create dataset checkboxes
 	var choiceContainer = $("#choices");
 	$.each(datasets, function(key, val) {
 		choiceContainer.append("<br/><input type='checkbox' name='" + key +
@@ -36,6 +36,22 @@ $(function() {
 	});
 	
 	choiceContainer.find("input").click(plotAccordingToChoices);
+	
+	{% if show_errors and not log_y  %}
+		showErrors = true;
+	{% else %}
+		showErrors = false;
+	{% endif %}
+	
+	var tsPoints = (showErrors) ? {
+		show: true,
+		radius: 3,
+		errorbars: 'y',
+		yerr: {show: true, upperCap: '-', lowerCap: '-', radius: 5}
+	} : {
+		show: true,
+		radius: 3
+	};
 	
 	function plotAccordingToChoices() {
 		var data = [];
@@ -47,14 +63,24 @@ $(function() {
 		});
 		if (data.length > 0) {
 			$.plot("#time_series_placeholder", data, {
+				series: {
+					lines: {
+						show: true
+					},
+					points: tsPoints
+				},
 				xaxis: {
-					tickDecimals: 0
+					tickDecimals: 0,
+					axisLabel: 'Year',
+					axisLabelUseCanvas: false
 				},
 				grid: {
 					color: "white",
 					borderWidth: 1,
 					borderColor: "#777",
-					markingsColor: "white"
+					markingsColor: "white",
+					hoverable: true,
+					clickable: true
 				},
 				legend: {
 					position: "nw",
@@ -63,7 +89,7 @@ $(function() {
 			});
 		}
 	}
-
+	
 	plotAccordingToChoices();
 
 	/*var timeSeries_points = {
@@ -127,7 +153,7 @@ $(function() {
 				max: yMax
 			}
 		});
-		
+	*/	
 	function showTooltip(x, y, contents) {
 		$("<div id='tooltip'>" + contents + "</div>").css({
 			position: "absolute",
@@ -138,7 +164,7 @@ $(function() {
 			padding: "2px",
 			"background-color": "#fff",
 			color: "#000",
-			opacity: 0.80
+			opacity: 0.70
 		}).appendTo("body").fadeIn(200);
 	}
 
@@ -164,7 +190,7 @@ $(function() {
 			$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
 			plot.highlight(item.series, item.datapoint);
 		}
-	});*/
+	});
 	
 });
 
@@ -293,11 +319,12 @@ $(function() {
 						<option value="anpp">anpp</option>
 						<option value="npp_wet">npp_wet</option>
 					</select>
-				</li>--->
-				<li><input type="checkbox" value="Yes" name="get_summary" id="get_summary" />Get summary statistics</li>
+				</li>
+				<li><input type="checkbox" value="Yes" name="get_summary" id="get_summary" />Get summary statistics</li>--->
 				<li><input type="checkbox" value="Yes" name="get_histogram" id="get_histogram" checked="checked" />Get histogram</li>
 				<li><input type="checkbox" value="Yes" name="get_time_series" id="get_time_series" checked="checked" />Get time series</li>
 				<li><input type="checkbox" value="Yes" name="log_y" id="log_y" checked="checked" />Log-transform time series</li>
+				<li><input type="checkbox" value="Yes" name="show_errors" id="show_errors" />Error bars</li>
 				<li><input type="submit" value="Fetch" /></li>
 			</ul>
 			</form>
