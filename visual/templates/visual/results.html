@@ -339,14 +339,14 @@ $(function() {
 				</ul>
 			{% endif %}--->
 			{% if get_time_series %}
-				<p class="announce">Time series</p>
+				<!---<p class="announce">Time series</p>--->
 				<div class="flot-container">
 					<div id="time_series_placeholder" class="flot-placeholder"></div>
 					<p id="choices" style="float:right; width:135px;"></p>
 				</div>
 			{% endif %}
 			{% if get_histogram %}
-				<p class="announce">Histogram</p>
+				<!---<p class="announce">Histogram</p>--->
 				<div class="flot-container">
 					<div id="histogram_placeholder" class="flot-placeholder"></div>
 				</div>
@@ -356,7 +356,7 @@ $(function() {
 	<div class="push"></div>
 </div>
 <div id="footer">
-	<p>Copyright &copy; 2013 Fox Peterson.  All rights reserved.  Design by <a href="http://www.tinybike.com">Tinybike Interactive</a>.</p>
+	<p>Copyright &copy; 2013 Fox Peterson.  All rights reserved.<br />Design by <a href="http://www.tinybike.com">Tinybike Interactive</a>.  Plots created with <a href="http://www.flotcharts.org/">Flot</a>.</p>
 </div>
 </body>
 </html>
