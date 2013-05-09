@@ -3,6 +3,10 @@ from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from plotter import Plotter
+try:
+	import json
+except ImportError:
+	import simplejson as json
 
 def results(request):
 	
@@ -23,14 +27,16 @@ def results(request):
 	P.fetch_data()
 	P.make_plots()
 	
-	zipped_summary = zip(
+	summary = zip(
 		P.summary['yearly'][table][dataset][2007].keys(), 
 		P.summary['yearly'][table][dataset][2007].values()
 	)
 	histogram = zip(P.hist['bin'][dataset], P.hist['percent'][dataset])
+	
 	time_series = zip(
 		P.time_series[dataset]['year'],
-		P.time_series[dataset]['mean']
+		P.time_series[dataset]['mean'],
+		P.time_series[dataset]['std']
 	)
 	
 	return render(request, 'visual/results.html', {
@@ -39,10 +45,11 @@ def results(request):
 		'get_summary': get_summary,
 		'get_histogram': get_histogram,
 		'get_time_series': get_time_series,
-		'summary': zipped_summary,
+		'summary': summary,
 		'num_bins': P.num_bins,
 		'histogram': histogram,
 		'time_series': time_series,
+		'json_time_series': json.dumps(P.time_series),
 		'data': P.data,
 	})
 

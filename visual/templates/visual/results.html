@@ -10,17 +10,35 @@
 <script src="{% static 'visual/js/jquery.js' %}"></script>
 <script src="{% static 'visual/js/jquery.flot.js' %}"></script>
 <script src="{% static 'visual/js/jquery.flot.axislabels.js' %}"></script>
+<script src="{% static 'visual/js/jquery.flot.errorbars.js' %}"></script>
+<script src="{% static 'visual/js/jquery.flot.resize.js' %}"></script>
 <script>
 $(function() {
 	var timeSeries = [];
+	var jsonTimeSeries = {{ json_time_series|safe }};
 	
-	{% for year, value in time_series %}
-		timeSeries.push([{{ year }}, {{ value }}]);
+	var timeSeries_points = {
+		show: true,
+		radius: 5,
+		errorbars: 'y',
+		yerr: {show:true, upperCap: '-', lowerCap: '-', radius: 5}
+	};
+	
+	{% for year, value, error_bar in time_series %}
+		timeSeries.push([{{ year }}, {{ value }}, {{ error_bar }}]);
 	{% endfor %}
-		
-	var plot = $.plot("#time_series_placeholder", [
-			{ data: timeSeries, label: "{{ dataset }}", color: "green"}
-		], {
+	
+	var data = [
+		{
+			data: timeSeries,
+			label: "{{ dataset }}",
+			color: "green",
+			points: timeSeries_points,
+			lines: {show: true}
+		}
+	]
+	
+	var plot = $.plot("#time_series_placeholder", data, {
 			series: {
 				lines: {
 					show: true
@@ -80,6 +98,7 @@ $(function() {
 			plot.highlight(item.series, item.datapoint);
 		}
 	});
+	
 });
 
 $(function() {
@@ -149,7 +168,7 @@ $(function() {
 	});
 });
 </script>
-<!---<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700|Archivo+Narrow:400,700" />--->
+<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700|Archivo+Narrow:400,700" />
 <link rel="stylesheet" type="text/css" href="{% static 'visual/style.css' %}" />
 </head>
 <body>
