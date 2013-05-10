@@ -18,8 +18,8 @@ def results(request):
 	log_y = True if 'log_y' in request.POST.keys() else False
 	show_errors = True if 'show_errors' in request.POST.keys() else False
 	select_stat = request.POST['select_stat']
-	#select_span = request.POST['select_span']
-	select_span = 'month'
+	select_span = request.POST['select_span']
+	#select_span = 'month'
 	
 	#if dataset == 'bio' or dataset == 'gro':
 	#	table = 'piedata'
@@ -51,14 +51,26 @@ def results(request):
 	else:
 		time_series = P.monthly_time_series
 		field_list = ['bio', 'gro', 'npp_wet']
-	
+		
+	season_to_month = {
+		'autumn': 11,
+		'summer': 8,
+		'spring': 5,
+		'winter': 2,
+	}
+
 	json_time_series = {}
 	json_histogram = {}
 	for field in field_list:
 		if log_y:
 			values = [None if j == 0 else log(j) \
 				for j in time_series[field][select_stat]]
-			data = zip(time_series[field][select_span], values)
+			if field == 'npp_wet' and select_span == 'month':
+				period = [season_to_month[j] \
+					for j in time_series[field][select_span]]
+			else:
+				period = time_series[field][select_span]
+			data = zip(period, values)
 		else:
 			values = time_series[field][select_stat]
 			if show_errors:
@@ -66,6 +78,12 @@ def results(request):
 				data = zip(time_series[field][select_span], values, error_bars)
 			else:
 				data = zip(time_series[field][select_span], values)
+			if field == 'npp_wet' and select_span == 'month':
+				period = [season_to_month[j] \
+					for j in time_series[field][select_span]]
+			else:
+				period = time_series[field][select_span]
+			data = zip(period, values)
 		data = [list(j) for j in data]
 		json_time_series[field] = {'label': field, 'data': data}
 		

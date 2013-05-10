@@ -42,8 +42,14 @@ class Plotter:
 		period_label = 'mm' if dataset == 'piedata' else 'season'
 		
 		# Find all unique months
-		self.cursor.execute("SELECT DISTINCT `%s` FROM %s" % (period_label, dataset))
-		periods = [row[0] for row in self.cursor.fetchall()]
+		if period_label == 'mm':
+			self.cursor.execute(
+				"SELECT DISTINCT `%s` FROM %s ORDER BY `%s`" 
+				% (period_label, dataset, period_label)
+			)
+			periods = [row[0] for row in self.cursor.fetchall()]
+		else:
+			periods = ['winter', 'spring', 'summer', 'autumn']
 		
 		for field in fields:
 			summary[field] = OrderedDict()

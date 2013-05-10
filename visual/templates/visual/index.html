@@ -7,6 +7,236 @@
 <title>dataRonin</title>
 <meta name="keywords" content="" />
 <meta name="description" content="" />
+<script src="{% static 'visual/js/jquery.js' %}"></script>
+<script src="{% static 'visual/js/jquery.flot.js' %}"></script>
+<script src="{% static 'visual/js/jquery.flot.axislabels.js' %}"></script>
+<script src="{% static 'visual/js/jquery.flot.errorbars.js' %}"></script>
+<script src="{% static 'visual/js/jquery.flot.resize.js' %}"></script>
+<script>
+$(function() {
+	/*var timeSeries = [];
+	var plusRange = [];
+	var minusRange = [];*/
+	var datasets = {{ json_time_series|safe }};
+	var selectSpan = '{{ select_span }}';
+	
+	// Hard-code color indices (to prevent them from shifting)
+	var i = 0;
+	$.each(datasets, function(key, val) {
+		val.color = i;
+		++i;
+	});
+	
+	// Create dataset checkboxes
+	var choiceContainer = $("#choices");
+	$.each(datasets, function(key, val) {
+		choiceContainer.append("<li><input type='checkbox' name='" + key +
+			"' checked='checked' id='id" + key + "'></input>" +
+			"<label for='id" + key + "'> "
+			+ val.label + "</label></li>");
+	});
+	choiceContainer.find("input").click(plotAccordingToChoices);
+	
+	{% if show_errors and not log_y  %}
+		showErrors = true;
+	{% else %}
+		showErrors = false;
+	{% endif %}
+	
+	var tsPoints = (showErrors) ? {
+		show: true,
+		radius: 3,
+		errorbars: 'y',
+		yerr: {show: true, upperCap: '-', lowerCap: '-', radius: 5}
+	} : {
+		show: true,
+		radius: 3
+	};
+	
+	var xLabel = (selectSpan === 'year') ? 'Year' : 'Month';
+	
+	function plotAccordingToChoices() {
+		var data = [];
+		choiceContainer.find("input:checked").each(function () {
+			var key = $(this).attr("name");
+			if (key && datasets[key]) {
+				data.push(datasets[key]);
+			}
+		});
+		if (data.length > 0) {
+			$.plot("#time_series_placeholder", data, {
+				series: {
+					lines: {
+						show: true
+					},
+					points: tsPoints
+				},
+				xaxis: {
+					tickDecimals: 0,
+					axisLabel: xLabel,
+					axisLabelUseCanvas: false
+				},
+				yaxis: {
+					position: "right"
+				},
+				grid: {
+					color: "white",
+					borderWidth: 1,
+					borderColor: "#777",
+					markingsColor: "white",
+					hoverable: true,
+					clickable: true
+				},
+				legend: {
+					show: false
+					/*position: "nw",
+					backgroundOpacity: 0.15*/
+				}
+			});
+		}
+	}
+	
+	plotAccordingToChoices();
+
+	function showTooltip(x, y, contents) {
+		$("<div id='tooltip'>" + contents + "</div>").css({
+			position: "absolute",
+			display: "none",
+			top: y - 25,
+			left: x + 5,
+			border: "1px solid #ccc",
+			padding: "2px",
+			"background-color": "#fff",
+			color: "#000",
+			opacity: 0.80
+		}).appendTo("body").fadeIn(200);
+	}
+
+	var previousPoint = null;
+	$("#time_series_placeholder").bind("plothover", function (event, pos, item) {		
+		if (item) {
+			if (previousPoint != item.dataIndex) {
+				previousPoint = item.dataIndex;
+				$("#tooltip").remove();
+				var x = item.datapoint[0].toFixed(2),
+				y = item.datapoint[1].toFixed(2);
+				{% if log_y %}
+					showTooltip(item.pageX, item.pageY,
+						"log(" + item.series.label + ") = " + y + " in year " + parseInt(x));
+				{% else %}
+					showTooltip(item.pageX, item.pageY,
+						item.series.label + " = " + y + " in year " + parseInt(x));
+				{% endif %}
+			}
+		} else {
+			$("#tooltip").remove();
+			previousPoint = null;            
+		}
+	});
+
+	$("#time_series_placeholder").bind("plotclick", function (event, pos, item) {
+		if (item) {
+			$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
+			plot.highlight(item.series, item.datapoint);
+		}
+	});
+	
+});
+
+$(function() {	
+	var datasets = {{ json_histogram|safe }};
+	
+	// Hard-code color indices (to prevent them from shifting)
+	var i = 0;
+	$.each(datasets, function(key, val) {
+		val.color = i;
+		++i;
+	});
+	
+	// Create dataset checkboxes
+	var choiceContainer = $("#choices");
+	
+	choiceContainer.find("input").click(plotAccordingToChoices);
+	
+	function plotAccordingToChoices() {
+		var data = [];
+		choiceContainer.find("input:checked").each(function () {
+			var key = $(this).attr("name");
+			if (key && datasets[key]) {
+				data.push(datasets[key]);
+			}
+		});
+		if (data.length > 0) {
+			$.plot("#histogram_placeholder", data, {
+				bars: {
+					show: true,
+					barWidth: 10 //histogram[1][0] - histogram[0][0]
+				},
+				grid: {
+					color: "white",
+					borderWidth: 1,
+					borderColor: "#777",
+					markingsColor: "white",
+					hoverable: true,
+					clickable: true
+				},
+				yaxis: {
+					axisLabel: '%',
+					axisLabelUseCanvas: false
+				},
+				xaxis: {
+					axisLabel: 'Value',
+					axisLabelUseCanvas: false
+				},
+				legend: {
+					position: "ne",
+					backgroundOpacity: 0.15
+				}
+			});
+		}
+	}
+	
+	plotAccordingToChoices();
+	
+	function showTooltip(x, y, contents) {
+		$("<div id='tooltip'>" + contents + "</div>").css({
+			position: "absolute",
+			display: "none",
+			top: y - 25,
+			left: x + 5,
+			border: "1px solid #ccc",
+			padding: "2px",
+			"background-color": "#fff",
+			color: "#000",
+			opacity: 0.70
+		}).appendTo("body").fadeIn(200);
+	}
+
+	var previousPoint = null;
+	$("#histogram_placeholder").bind("plothover", function (event, pos, item) {		
+		if (item) {
+			if (previousPoint != item.dataIndex) {
+				previousPoint = item.dataIndex;
+				$("#tooltip").remove();
+				var x = item.datapoint[0].toFixed(2),
+				y = item.datapoint[1].toFixed(2);
+				showTooltip(item.pageX, item.pageY,
+					y + "% chance of " + item.series.label + " = " + x);
+			}
+		} else {
+			$("#tooltip").remove();
+			previousPoint = null;            
+		}
+	});
+
+	$("#histogram_placeholder").bind("plotclick", function (event, pos, item) {
+		if (item) {
+			$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
+			plot.highlight(item.series, item.datapoint);
+		}
+	});
+});
+</script>
 <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700|Archivo+Narrow:400,700" />
 <link rel="stylesheet" type="text/css" href="{% static 'visual/style.css' %}" />
 </head>
@@ -57,32 +287,62 @@
 	<div id="banner-wrapper"></div>
 	<div id="plotter_page" class="container">
 		<div id="leftbar">
-			<form action="/visual/results/" method="post">
-			<ul>
-				{% csrf_token %}
-				<li>
-					Dataset:
-					<select name="dataset" id="dataset">
-						<option value="bio">bio</option>
-						<option value="bio_all">bio_all</option>
-						<option value="gro">gro</option>
-						<option value="anpp">anpp</option>
-						<option value="npp_wet">npp_wet</option>
+			<div id="fetch_data">
+				<p class="boxheader">Time series options</p>
+				<form action="/visual/results/" method="post">
+				<ul>
+					{% csrf_token %}
+					<!---<li>
+						Dataset:
+						<select name="dataset" id="dataset">
+							<option value="bio">bio</option>
+							<option value="bio_all">bio_all</option>
+							<option value="gro">gro</option>
+							<option value="anpp">anpp</option>
+							<option value="npp_wet">npp_wet</option>
+						</select>
+					</li>
+					<li><input type="checkbox" value="Yes" name="get_summary" id="get_summary" />Get summary statistics</li>
+					<li><input type="checkbox" value="Yes" name="get_histogram" id="get_histogram" checked="checked" />Get histogram</li>
+					<li><input type="checkbox" value="Yes" name="get_time_series" id="get_time_series" checked="checked" />Get time series</li>--->
+					<li>
+					Statistic:&nbsp;&nbsp;
+					<select name="select_stat" id="select_stat">
+						<option value="mean">mean</option>
+						<option value="median">median</option>
+						<option value="quartile_1">1st quartile</option>
+						<option value="quartile_3">3rd quartile</option>
+						<option value="max">maximum</option>
+						<option value="min">minimum</option>
 					</select>
-				</li>
-				<li><input type="checkbox" value="Yes" name="get_summary" id="get_summary" />Get summary statistics</li>
-				<li><input type="checkbox" value="Yes" name="get_histogram" id="get_histogram" />Get histogram</li>
-				<li><input type="checkbox" value="Yes" name="get_time_series" id="get_time_series" />Get time series</li>
-				<li><input type="submit" value="Fetch" /></li>
-			</ul>
-			</form>
+					</li>
+					<li>
+					Period:&nbsp;&nbsp;
+					<select name="select_span" id="select_span">
+						<option value="year">year</option>
+						<option value="month">month/season</option>
+					</select>
+					</li>
+					<li><input type="checkbox" value="Yes" name="show_errors" id="show_errors" /> Get error bars</li>
+					<li><input type="checkbox" value="Yes" name="log_y" id="log_y" checked="checked" /> Log-transform</li>
+				</ul>
+				<p class="boxheader">Histogram options</p>
+				<ul>
+				<li><input type="text" size="1" value="25" name="num_bins" id="num_bins" />&nbsp;&nbsp;Number of bins</li>
+				</ul>
+				<div id="data_button">
+					<input class="small_button" type="submit" value="Get data" />
+				</div>
+				</form>
+			</div>
 		</div>
-		<div id="plotter"></div>
+		<div id="plotter">
+		</div>
 	</div>
 	<div class="push"></div>
 </div>
 <div id="footer">
-	<p>Copyright &copy; 2013 Fox Peterson.  All rights reserved.  Design by <a href="http://www.tinybike.com">Tinybike Interactive</a>.</p>
+	<p>Copyright &copy; 2013 <a href="mailto:fox.peterson@oregonstate.edu">Fox Peterson</a>.  All rights reserved.<br />Design by <a href="http://www.tinybike.com">Tinybike Interactive</a>.  Plots created with <a href="http://www.flotcharts.org/">Flot</a>.</p>
 </div>
 </body>
 </html>
