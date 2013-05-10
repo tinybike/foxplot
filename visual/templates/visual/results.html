@@ -200,6 +200,29 @@ $(function() {
 	
 	choiceContainer.find("input").click(plotAccordingToChoices);
 	
+	{% if hist_log_y %}
+		log_y = true
+		transformYAxis = function(y) {
+			return Math.log(y+0.0001);
+		}
+	{% else %}
+		hist_log_y = false
+		transformYAxis = function(y) {
+			return y;
+		}
+	{% endif %}
+	{% if hist_log_x %}
+		log_x = true
+		transformXAxis = function(x) {
+			return Math.log(x+0.0001);
+		}
+	{% else %}
+		hist_log_x = false
+		transformXAxis = function(x) {
+			return x;
+		}
+	{% endif %}
+
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -223,10 +246,12 @@ $(function() {
 					clickable: true
 				},
 				yaxis: {
+					transform: transformYAxis,
 					axisLabel: '%',
 					axisLabelUseCanvas: false
 				},
 				xaxis: {
+					transform: transformXAxis,
 					axisLabel: 'Value',
 					axisLabelUseCanvas: false
 				},

@@ -16,6 +16,8 @@ def results(request):
 	get_histogram = True if 'get_histogram' in request.POST.keys() else False
 	get_time_series = True if 'get_time_series' in request.POST.keys() else False
 	log_y = True if 'log_y' in request.POST.keys() else False
+	hist_log_y = True if 'hist_log_y' in request.POST.keys() else False
+	hist_log_x = True if 'hist_log_x' in request.POST.keys() else False
 	show_errors = True if 'show_errors' in request.POST.keys() else False
 	select_stat = request.POST['select_stat']
 	select_span = request.POST['select_span']
@@ -111,6 +113,8 @@ def results(request):
 		'select_span': select_span,
 		'show_errors': show_errors,
 		'log_y': log_y,
+		'hist_log_y': hist_log_y,
+		'hist_log_x': hist_log_x,
 		'bin_sizes': bin_sizes,
 		#'summary': summary,
 		'num_bins': P.num_bins,
