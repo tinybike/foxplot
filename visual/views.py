@@ -19,17 +19,15 @@ def results(request):
 	show_errors = True if 'show_errors' in request.POST.keys() else False
 	select_stat = request.POST['select_stat']
 	select_span = request.POST['select_span']
-	align_start = True
-	num_bins = request.POST['num_bins']
-	#align_start = request.POST['align_start']
-	#select_span = 'month'
+	num_bins = int(request.POST['num_bins'])
+	align_start = True if 'align_start' in request.POST['align_start'] else False
 	
 	#if dataset == 'bio' or dataset == 'gro':
-	#	table = 'piedata'
+	#	data_label = 'PIE' # Plum Island Ecosystem: estuary (Spartina spp.)
 	#elif dataset == 'bio_all':
-	#	table = 'hja_ws1_test'
+	#	data_label = 'HJA' # HJ Andrews: old-growth forest (Psuedotsuga menziesii)
 	#else:
-	#	table = 'kelp_grow_npp'
+	#	data_label = 'SBC' # Santa Barbara Coastal: sea vegetation (Macrocystis spp.)
 	
 	P = Plotter(bins=num_bins, align=align_start)
 	P.summary_stats()
@@ -63,18 +61,10 @@ def results(request):
 				for j in time_series[field][select_stat]]
 			if show_errors:
 				error_bars = time_series[field]['std']
-				if field == 'npp_wet' and select_span == 'month':
-					period = [season_to_month[j] \
-						for j in time_series[field][select_span]]
-				else:
-					period = time_series[field][select_span]
+				period = time_series[field][select_span]
 				data = zip(period, values, error_bars)
 			else:
-				if field == 'npp_wet' and select_span == 'month':
-					period = [season_to_month[j] \
-						for j in time_series[field][select_span]]
-				else:
-					period = time_series[field][select_span]
+				period = time_series[field][select_span]
 				data = zip(period, values)
 		else:
 			values = time_series[field][select_stat]

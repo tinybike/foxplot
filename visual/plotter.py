@@ -41,32 +41,24 @@ class Plotter:
 		bio: gro and bio are monthly data, npp_wet is seasonal data.
 		"""
 		summary = {}
-		period_label = 'mm' if dataset == 'piedata' else 'season'
+		period_label = 'mm' if dataset == 'piedata' else 'season_number'
 		
 		# Find all unique months
-		if period_label == 'mm':
-			self.cursor.execute(
-				"SELECT DISTINCT `%s` FROM %s ORDER BY `%s`" 
-				% (period_label, dataset, period_label)
-			)
-			periods = [row[0] for row in self.cursor.fetchall()]
-		else:
-			periods = ['winter', 'spring', 'summer', 'autumn']
-		
+		self.cursor.execute(
+			"SELECT DISTINCT `%s` FROM %s ORDER BY `%s`" 
+			% (period_label, dataset, period_label)
+		)
+		periods = [row[0] for row in self.cursor.fetchall()]
+				
 		if self.align:
 			start_time = min(periods)
-			periods = [period-start_time for period in periods]
-		
-		season_to_month = {
-			'autumn': 11,
-			'summer': 8,
-			'spring': 5,
-			'winter': 2,
-		}
-		
+			aligned_periods = [period-start_time for period in periods]
+		else:
+			aligned_periods = periods
+				
 		for field in fields:
 			summary[field] = OrderedDict()
-			for period in periods:
+			for i, period in enumerate(periods):
 				if period_label == 'mm':
 					sql = (
 						"SELECT `%s` FROM %s WHERE `%s` = %i" 
@@ -83,9 +75,9 @@ class Plotter:
 				# needed
 				adjustment = 3650 if field == 'npp_wet' else 1
 				results = [row[0]*adjustment for row in self.cursor.fetchall()]
-				
+								
 				# Calculate summary statistics
-				summary[field][period] = {
+				summary[field][aligned_periods[i]] = {
 					'min': min(results),
 					'quartile_1': percentile(results, 25),
 					'mean': mean(results),
@@ -111,11 +103,13 @@ class Plotter:
 		
 		if self.align:
 			start_time = min(years)
-			years = [year-start_time for year in years]
-
+			aligned_years = [year-start_time for year in years]
+		else:
+			aligned_years = years
+			
 		for field in fields:
 			summary[field] = OrderedDict()
-			for year in years:
+			for i, year in enumerate(years):
 				self.cursor.execute(
 					"SELECT `%s` FROM %s WHERE `%s` = %i" 
 					% (field, dataset, year_label, int(year))
@@ -132,7 +126,7 @@ class Plotter:
 				results = [row[0]*adjustment for row in self.cursor.fetchall()]
 
 				# Calculate summary statistics
-				summary[field][year] = {
+				summary[field][aligned_years[i]] = {
 					'min': min(results),
 					'quartile_1': percentile(results, 25),
 					'mean': mean(results),

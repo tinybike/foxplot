@@ -60,6 +60,22 @@ fields terminated by ','
 ignore 1 lines
 (`site`, `year`, `season`, `npp_wet`, `npp_dry`, `npp_carbon`, `npp_nitrogen`, `growth_rate_wet`, `growth_rate_dry`, `growth_rate_carbon`, `growth_rate_nitrogen`, `se_npp_wet`, `se_npp_dry`, `se_npp_carbon`, `se_npp_nitrogen`, `se_growth_rate_wet`, `se_growth_rate_dry`, `se_growth_rate_carbon`, `se_growth_rate_nitrogen`);
 
+alter table kelp_grow_npp
+add column `season_number` int unsigned
+after `season`;
+
+update kelp_grow_npp
+set `season_number` = 2 where `season` = 'winter';
+
+update kelp_grow_npp
+set `season_number` = 5 where `season` = 'spring';
+
+update kelp_grow_npp
+set `season_number` = 8 where `season` = 'summer';
+
+update kelp_grow_npp
+set `season_number` = 11 where `season` = 'autumn';
+
 drop table if exists hja_ws1_test;
 
 create table hja_ws1_test (
