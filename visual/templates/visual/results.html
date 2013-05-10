@@ -18,6 +18,7 @@ $(function() {
 	var plusRange = [];
 	var minusRange = [];*/
 	var datasets = {{ json_time_series|safe }};
+	var selectSpan = '{{ select_span }}';
 	
 	// Hard-code color indices (to prevent them from shifting)
 	var i = 0;
@@ -52,6 +53,8 @@ $(function() {
 		radius: 3
 	};
 	
+	var xLabel = (selectSpan === 'year') ? 'Year' : 'Month';
+	
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -70,7 +73,7 @@ $(function() {
 				},
 				xaxis: {
 					tickDecimals: 0,
-					axisLabel: 'Year',
+					axisLabel: xLabel,
 					axisLabelUseCanvas: false
 				},
 				yaxis: {
@@ -313,9 +316,15 @@ $(function() {
 						<option value="min">minimum</option>
 					</select>
 					</li>
+					<li>
+					Span:&nbsp;&nbsp;
+					<select name="select_span" id="select_span">
+						<option value="year">year</option>
+						<option value="month">month</option>
+					</select>
+					</li>
 					<li><input type="checkbox" value="Yes" name="show_errors" id="show_errors" /> Get error bars</li>
-					<li><input type="checkbox" value="Yes" name="log_y" id="log_y" checked="checked" /> Log-transform time series</li>
-					<li><input type="checkbox" value="Yes" name="aggregate" id="aggregate" /> Aggregated monthly data</li>
+					<li><input type="checkbox" value="Yes" name="log_y" id="log_y" checked="checked" /> Log-transform</li>
 				</ul>
 				<p class="boxheader">Histogram options</p>
 				<ul>

@@ -18,6 +18,8 @@ def results(request):
 	log_y = True if 'log_y' in request.POST.keys() else False
 	show_errors = True if 'show_errors' in request.POST.keys() else False
 	select_stat = request.POST['select_stat']
+	#select_span = request.POST['select_span']
+	select_span = 'month'
 	
 	#if dataset == 'bio' or dataset == 'gro':
 	#	table = 'piedata'
@@ -43,19 +45,27 @@ def results(request):
 	#	P.time_series[dataset]['std']
 	#)
 	
+	if select_span == 'year':
+		time_series = P.time_series
+		field_list = ['bio', 'gro', 'bio_all', 'npp_wet', 'anpp']
+	else:
+		time_series = P.monthly_time_series
+		field_list = ['bio', 'gro', 'npp_wet']
+	
 	json_time_series = {}
 	json_histogram = {}
-	for field in ['bio', 'gro', 'bio_all', 'npp_wet', 'anpp']:
+	for field in field_list:
 		if log_y:
-			values = [None if j == 0 else log(j) for j in P.time_series[field][select_stat]]
-			data = zip(P.time_series[field]['year'], values)
+			values = [None if j == 0 else log(j) \
+				for j in time_series[field][select_stat]]
+			data = zip(time_series[field][select_span], values)
 		else:
-			values = P.time_series[field][select_stat]
+			values = time_series[field][select_stat]
 			if show_errors:
-				error_bars = P.time_series[field]['std']
-				data = zip(P.time_series[field]['year'], values, error_bars)
+				error_bars = time_series[field]['std']
+				data = zip(time_series[field][select_span], values, error_bars)
 			else:
-				data = zip(P.time_series[field]['year'], values)
+				data = zip(time_series[field][select_span], values)
 		data = [list(j) for j in data]
 		json_time_series[field] = {'label': field, 'data': data}
 		
@@ -69,6 +79,7 @@ def results(request):
 		#'get_summary': get_summary,
 		#'get_histogram': get_histogram,
 		#'get_time_series': get_time_series,
+		'select_span': select_span,
 		'show_errors': show_errors,
 		'log_y': log_y,
 		#'summary': summary,

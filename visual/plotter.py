@@ -16,6 +16,7 @@ class Plotter:
 		self.cursor = connection.cursor()
 		self.num_bins = num_bins
 		self.summary, self.data, self.hist, self.time_series = {}, {}, {}, {}
+		self.monthly_time_series = {}
 
 	def summary_stats(self):
 		"""
@@ -72,6 +73,7 @@ class Plotter:
 					'median': median(results),
 					'quartile_3': percentile(results, 75),
 					'max': max(results),
+					'std': std(results),
 				}
 		
 		return summary
@@ -172,6 +174,9 @@ class Plotter:
 			self.hist['percent'][field], self.hist['bin'][field] = \
 				self.get_histogram(dataset, field)
 			self.time_series[field] = self.get_time_series(dataset, field)
+			if field in ['bio', 'gro', 'npp_wet']:
+				self.monthly_time_series[field] = \
+					self.get_time_series(dataset, field, 'aggregate')
 		
 	def get_histogram(self, dataset, field):
 		"""
@@ -186,22 +191,22 @@ class Plotter:
 			for j in xrange(self.num_bins)]
 		return percentages, bin_centers
 
-	def get_time_series(self, dataset, field, align=True):
+	def get_time_series(self, dataset, field, aggregate='yearly'):
 		"""
-		Return time series, aggregated by year.  User specifies whether the
-		overlay is aligned or not.
+		Return time series, per year aggregated over months.
 		"""
 		time_series = {}
-		time_series['year'] = \
-			[year for year in self.summary['yearly'][dataset][field]]
+		time_key = 'year' if aggregate == 'yearly' else 'month'
+		time_series[time_key] = \
+			[span for span in self.summary[aggregate][dataset][field]]
 		stat_list = ['mean', 'std', 'median', 'quartile_1', 'quartile_3', 'max', 'min']
 		for stat in stat_list:
 			time_series[stat] = [
-				self.summary['yearly'][dataset][field][year][stat] for year in \
-					self.summary['yearly'][dataset][field]
+				self.summary[aggregate][dataset][field][span][stat] for span in \
+					self.summary[aggregate][dataset][field]
 			]
 		return time_series
-		
+			
 #pyplot.hist(data['hja_ws1_test']['bio_all'], bins=num_bins)
 #pyplot.show()
 
