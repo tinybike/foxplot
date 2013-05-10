@@ -20,6 +20,7 @@ def results(request):
 	select_stat = request.POST['select_stat']
 	select_span = request.POST['select_span']
 	align_start = True
+	num_bins = request.POST['num_bins']
 	#align_start = request.POST['align_start']
 	#select_span = 'month'
 	
@@ -30,7 +31,7 @@ def results(request):
 	#else:
 	#	table = 'kelp_grow_npp'
 	
-	P = Plotter(align=align_start)
+	P = Plotter(bins=num_bins, align=align_start)
 	P.summary_stats()
 	P.fetch_data()
 	P.make_plots()
@@ -54,25 +55,27 @@ def results(request):
 		time_series = P.monthly_time_series
 		field_list = ['bio', 'gro', 'npp_wet']
 		
-	season_to_month = {
-		'autumn': 11,
-		'summer': 8,
-		'spring': 5,
-		'winter': 2,
-	}
-
 	json_time_series = {}
 	json_histogram = {}
 	for field in field_list:
 		if log_y:
 			values = [None if j == 0 else log(j) \
 				for j in time_series[field][select_stat]]
-			if field == 'npp_wet' and select_span == 'month':
-				period = [season_to_month[j] \
-					for j in time_series[field][select_span]]
+			if show_errors:
+				error_bars = time_series[field]['std']
+				if field == 'npp_wet' and select_span == 'month':
+					period = [season_to_month[j] \
+						for j in time_series[field][select_span]]
+				else:
+					period = time_series[field][select_span]
+				data = zip(period, values, error_bars)
 			else:
-				period = time_series[field][select_span]
-			data = zip(period, values)
+				if field == 'npp_wet' and select_span == 'month':
+					period = [season_to_month[j] \
+						for j in time_series[field][select_span]]
+				else:
+					period = time_series[field][select_span]
+				data = zip(period, values)
 		else:
 			values = time_series[field][select_stat]
 			if show_errors:

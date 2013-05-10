@@ -12,12 +12,12 @@ from collections import OrderedDict
 
 class Plotter:
 
-	def __init__(self, num_bins=25, align=False):
+	def __init__(self, bins=25, align=False):
 		self.cursor = connection.cursor()
-		self.num_bins = num_bins
+		self.num_bins = bins
+		self.align = align
 		self.summary, self.data, self.hist, self.time_series = {}, {}, {}, {}
 		self.monthly_time_series = {}
-		self.align = align
 
 	def summary_stats(self):
 		"""
@@ -33,6 +33,7 @@ class Plotter:
 			'kelp_grow_npp': self.aggregated_stats('kelp_grow_npp', ['npp_wet']),
 			'piedata': self.aggregated_stats('piedata', ['gro', 'bio']),
 		}
+		self.summary['total'] = {}
 
 	def aggregated_stats(self, dataset, fields):
 		"""
@@ -51,6 +52,17 @@ class Plotter:
 			periods = [row[0] for row in self.cursor.fetchall()]
 		else:
 			periods = ['winter', 'spring', 'summer', 'autumn']
+		
+		if self.align:
+			start_time = min(periods)
+			periods = [period-start_time for period in periods]
+		
+		season_to_month = {
+			'autumn': 11,
+			'summer': 8,
+			'spring': 5,
+			'winter': 2,
+		}
 		
 		for field in fields:
 			summary[field] = OrderedDict()
@@ -96,6 +108,10 @@ class Plotter:
 		# Find all unique years
 		self.cursor.execute("SELECT DISTINCT `%s` FROM %s" % (year_label, dataset))
 		years = [row[0] for row in self.cursor.fetchall()]
+		
+		if self.align:
+			start_time = min(years)
+			years = [year-start_time for year in years]
 
 		for field in fields:
 			summary[field] = OrderedDict()
