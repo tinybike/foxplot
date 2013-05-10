@@ -7,7 +7,7 @@ try:
 	import json
 except ImportError:
 	import simplejson as json
-from math import log
+from math import log, sqrt
 
 def results(request):
 	
@@ -20,7 +20,7 @@ def results(request):
 	select_stat = request.POST['select_stat']
 	select_span = request.POST['select_span']
 	num_bins = int(request.POST['num_bins'])
-	align_start = True if 'align_start' in request.POST['align_start'] else False
+	align_start = True if 'align_start' in request.POST.keys() else False
 	
 	#if dataset == 'bio' or dataset == 'gro':
 	#	data_label = 'PIE' # Plum Island Ecosystem: estuary (Spartina spp.)
@@ -38,7 +38,7 @@ def results(request):
 	#	P.summary['yearly'][table][dataset][2007].keys(), 
 	#	P.summary['yearly'][table][dataset][2007].values()
 	#)
-	histogram = zip(P.hist['bin']['bio'], P.hist['percent']['bio'])
+	#histogram = zip(P.hist['bin']['bio'], P.hist['percent']['bio'])
 	
 	#time_series = zip(
 	#	P.time_series[dataset]['year'],
@@ -52,15 +52,20 @@ def results(request):
 	else:
 		time_series = P.monthly_time_series
 		field_list = ['bio', 'gro', 'npp_wet']
+	
+	bin_list = [P.hist['bin'][field][1] - P.hist['bin'][field][0] \
+		for field in field_list]
+	bin_sizes = zip(field_list, bin_list)
 		
 	json_time_series = {}
 	json_histogram = {}
 	for field in field_list:
 		if log_y:
-			values = [None if j == 0 else log(j) \
+			values = [None if j <= 0 else log(j) \
 				for j in time_series[field][select_stat]]
 			if show_errors:
-				error_bars = time_series[field]['std']
+				error_bars = [None if j <= 0 else log(j/sqrt(N)) \
+					for j in time_series[field]['std']]
 				period = time_series[field][select_span]
 				data = zip(period, values, error_bars)
 			else:
@@ -69,21 +74,12 @@ def results(request):
 		else:
 			values = time_series[field][select_stat]
 			if show_errors:
-				error_bars = time_series[field]['std']
-				if field == 'npp_wet' and select_span == 'month':
-					period = [season_to_month[j] \
-						for j in time_series[field][select_span]]
-				else:
-					period = time_series[field][select_span]
+				error_bars = [j/sqrt(N) for j in time_series[field]['std']]
+				period = time_series[field][select_span]
 				data = zip(period, values, error_bars)
 			else:
-				if field == 'npp_wet' and select_span == 'month':
-					period = [season_to_month[j] \
-						for j in time_series[field][select_span]]
-				else:
-					period = time_series[field][select_span]
 				data = zip(period, values)
-			
+		
 		data = [list(j) for j in data]
 		json_time_series[field] = {'label': field, 'data': data}
 		
@@ -100,6 +96,7 @@ def results(request):
 		'select_span': select_span,
 		'show_errors': show_errors,
 		'log_y': log_y,
+		'bin_sizes': bin_sizes,
 		#'summary': summary,
 		'num_bins': P.num_bins,
 		#'histogram': histogram,

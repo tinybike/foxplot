@@ -75,7 +75,7 @@ class Plotter:
 				# needed
 				adjustment = 3650 if field == 'npp_wet' else 1
 				results = [row[0]*adjustment for row in self.cursor.fetchall()]
-								
+				
 				# Calculate summary statistics
 				summary[field][aligned_periods[i]] = {
 					'min': min(results),
@@ -223,14 +223,8 @@ class Plotter:
 					self.summary[aggregate][dataset][field]
 			]
 		return time_series
-			
-#pyplot.hist(data['hja_ws1_test']['bio_all'], bins=num_bins)
-#pyplot.show()
 
 if __name__ == '__main__':
-	"""
-	The user should be able to select which datasets he/she wants to include so that he can put in just one data set or two data sets for the first two (bio or bio_all or BOTH bio and bio_all) and up to all three data sets for the third (ANPP orNPP_wet or gro or ANPP AND NPP_wet or ANPP AND gro or gro and NPP_wet or all three)
-	"""
 	P = Plotter()
 	P.summary_stats()
 	P.fetch_data()

@@ -36,7 +36,7 @@ $(function() {
 	});
 	choiceContainer.find("input").click(plotAccordingToChoices);
 	
-	{% if show_errors and not log_y  %}
+	{% if show_errors  %}
 		showErrors = true;
 	{% else %}
 		showErrors = false;
@@ -51,6 +51,28 @@ $(function() {
 		show: true,
 		radius: 3
 	};
+	
+	{% for year, value, error_bar in time_series %}
+		timeSeries.push([{{ year }}, {{ value }}, {{ error_bar }}]);
+		plusRange.push({{ value }} + {{ error_bar }});
+		minusRange.push({{ value }} - {{ error_bar }});
+	{% endfor %}
+	
+	// Add some space to the top and bottom of the time series plot, and make
+	// sure the margins are symmetric
+	plusRange.sort();
+	minusRange.sort();
+	var yMin = (minusRange[0] > 0) ? minusRange[0] / 1.1 : minusRange[0] * 1.1;
+	var yMax = (plusRange.slice(-1)[0] > 0) ? plusRange.slice(-1)[0] * 1.1 : 
+		plusRange.slice(-1)[0] / 1.1;
+	plusDiff = Math.abs(plusRange.slice(-1)[0] - yMax);
+	minusDiff = Math.abs(minusRange[0] - yMin);
+	if (plusDiff > minusDiff) {
+		yMin = minusRange[0] - plusDiff;
+	}
+	else {
+		yMax = plusRange.slice(-1)[0] + minusDiff;
+	}
 	
 	var xLabel = (selectSpan === 'year') ? 'Year' : 'Month';
 	
@@ -110,7 +132,7 @@ $(function() {
 			opacity: 0.80
 		}).appendTo("body").fadeIn(200);
 	}
-
+	
 	var previousPoint = null;
 	$("#time_series_placeholder").bind("plothover", function (event, pos, item) {		
 		if (item) {
@@ -132,7 +154,7 @@ $(function() {
 			previousPoint = null;            
 		}
 	});
-
+	
 	$("#time_series_placeholder").bind("plotclick", function (event, pos, item) {
 		if (item) {
 			$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
@@ -144,6 +166,14 @@ $(function() {
 
 $(function() {	
 	var datasets = {{ json_histogram|safe }};
+	var binSizes = [];
+	{% for field, bin in bin_sizes %}
+		fieldName = '{{ field }}';
+		binSize = {{ bin }};
+		binSizes.push({
+			fieldName: binSize
+		});
+	{% endfor %}
 	
 	// Hard-code color indices (to prevent them from shifting)
 	var i = 0;
