@@ -85,8 +85,9 @@ $(function() {
 					clickable: true
 				},
 				legend: {
-					position: "nw",
-					backgroundOpacity: 0.15
+					show: false
+					/*position: "nw",
+					backgroundOpacity: 0.15*/
 				}
 			});
 		}
@@ -166,7 +167,7 @@ $(function() {
 			padding: "2px",
 			"background-color": "#fff",
 			color: "#000",
-			opacity: 0.70
+			opacity: 0.80
 		}).appendTo("body").fadeIn(200);
 	}
 
@@ -178,8 +179,13 @@ $(function() {
 				$("#tooltip").remove();
 				var x = item.datapoint[0].toFixed(2),
 				y = item.datapoint[1].toFixed(2);
-				showTooltip(item.pageX, item.pageY,
-					item.series.label + " = " + y + " in year " + parseInt(x));
+				{% if log_y %}
+					showTooltip(item.pageX, item.pageY,
+						"log(" + item.series.label + ") = " + y + " in year " + parseInt(x));
+				{% else %}
+					showTooltip(item.pageX, item.pageY,
+						item.series.label + " = " + y + " in year " + parseInt(x));
+				{% endif %}
 			}
 		} else {
 			$("#tooltip").remove();
