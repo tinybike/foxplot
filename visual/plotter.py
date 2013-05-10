@@ -12,11 +12,12 @@ from collections import OrderedDict
 
 class Plotter:
 
-	def __init__(self, num_bins=25):
+	def __init__(self, num_bins=25, align=False):
 		self.cursor = connection.cursor()
 		self.num_bins = num_bins
 		self.summary, self.data, self.hist, self.time_series = {}, {}, {}, {}
 		self.monthly_time_series = {}
+		self.align = align
 
 	def summary_stats(self):
 		"""
