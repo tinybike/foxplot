@@ -194,7 +194,8 @@ class Plotter:
 		time_series = {}
 		time_series['year'] = \
 			[year for year in self.summary['yearly'][dataset][field]]
-		for stat in ['mean', 'std']:
+		stat_list = ['mean', 'std', 'median', 'quartile_1', 'quartile_3', 'max', 'min']
+		for stat in stat_list:
 			time_series[stat] = [
 				self.summary['yearly'][dataset][field][year][stat] for year in \
 					self.summary['yearly'][dataset][field]

@@ -17,7 +17,8 @@ def results(request):
 	get_time_series = True if 'get_time_series' in request.POST.keys() else False
 	log_y = True if 'log_y' in request.POST.keys() else False
 	show_errors = True if 'show_errors' in request.POST.keys() else False
-
+	select_stat = request.POST['select_stat']
+	
 	#if dataset == 'bio' or dataset == 'gro':
 	#	table = 'piedata'
 	#elif dataset == 'bio_all':
@@ -63,6 +64,7 @@ def results(request):
 		json_histogram[field] = {'label': field, 'data': hist_data}
 	
 	return render(request, 'visual/results.html', {
+		'select_stat': select_stat,
 		#'dataset': dataset,
 		#'table': table,
 		#'get_summary': get_summary,
