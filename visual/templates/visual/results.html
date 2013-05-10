@@ -46,13 +46,13 @@ $(function() {
 		show: true,
 		radius: 3,
 		errorbars: 'y',
-		yerr: {show: true, upperCap: '-', lowerCap: '-', radius: 5}
+		yerr: {show: true, lineWidth: 1, upperCap: '-', lowerCap: '-', radius: 5}
 	} : {
 		show: true,
 		radius: 3
 	};
 	
-	{% for year, value, error_bar in time_series %}
+	/*{% for year, value, error_bar in time_series %}
 		timeSeries.push([{{ year }}, {{ value }}, {{ error_bar }}]);
 		plusRange.push({{ value }} + {{ error_bar }});
 		minusRange.push({{ value }} - {{ error_bar }});
@@ -72,9 +72,21 @@ $(function() {
 	}
 	else {
 		yMax = plusRange.slice(-1)[0] + minusDiff;
-	}
+	}*/
 	
 	var xLabel = (selectSpan === 'year') ? 'Year' : 'Month';
+	
+	{% if log_y %}
+		log_y = true
+		transformAxis = function(x) {
+			return Math.log(x+0.0001);
+		}
+	{% else %}
+		log_y = false
+		transformAxis = function(x) {
+			return x;
+		}
+	{% endif %}
 	
 	function plotAccordingToChoices() {
 		var data = [];
@@ -98,7 +110,8 @@ $(function() {
 					axisLabelUseCanvas: false
 				},
 				yaxis: {
-					position: "right"
+					position: "right",
+					transform: transformAxis
 				},
 				grid: {
 					color: "white",

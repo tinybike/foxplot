@@ -22,6 +22,13 @@ def results(request):
 	num_bins = int(request.POST['num_bins'])
 	align_start = True if 'align_start' in request.POST.keys() else False
 	
+	table_dict = {
+		'bio': 'piedata',
+		'gro': 'piedata',
+		'npp_wet': 'kelp_grow_npp',
+		'bio_all': 'hja_ws1_test',
+		'anpp': 'hja_ws1_test',
+	}
 	#if dataset == 'bio' or dataset == 'gro':
 	#	data_label = 'PIE' # Plum Island Ecosystem: estuary (Spartina spp.)
 	#elif dataset == 'bio_all':
@@ -60,25 +67,33 @@ def results(request):
 	json_time_series = {}
 	json_histogram = {}
 	for field in field_list:
+		time_key = 'yearly' if select_span == 'year' else 'aggregate'
+		this_summary = P.summary[time_key][table_dict[field]][field]
+		'''
 		if log_y:
 			values = [None if j <= 0 else log(j) \
 				for j in time_series[field][select_stat]]
 			if show_errors:
-				error_bars = [None if j <= 0 else log(j/sqrt(N)) \
-					for j in time_series[field]['std']]
+				N = [this_summary[j]['N'] for j in this_summary.keys()]
+				error_bars = [None if j <= 0 else log(j/sqrt(N[i]-1)) \
+					for i, j in enumerate(time_series[field]['std'])]
 				period = time_series[field][select_span]
 				data = zip(period, values, error_bars)
 			else:
 				period = time_series[field][select_span]
 				data = zip(period, values)
 		else:
-			values = time_series[field][select_stat]
-			if show_errors:
-				error_bars = [j/sqrt(N) for j in time_series[field]['std']]
-				period = time_series[field][select_span]
-				data = zip(period, values, error_bars)
-			else:
-				data = zip(period, values)
+		'''
+		values = time_series[field][select_stat]
+		if show_errors:
+			N = [this_summary[j]['N'] for j in this_summary.keys()]
+			error_bars = [j/sqrt(N[i]-1) \
+				for i, j in enumerate(time_series[field]['std'])]
+			period = time_series[field][select_span]
+			data = zip(period, values, error_bars)
+		else:
+			period = time_series[field][select_span]
+			data = zip(period, values)
 		
 		data = [list(j) for j in data]
 		json_time_series[field] = {'label': field, 'data': data}

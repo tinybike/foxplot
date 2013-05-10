@@ -85,6 +85,7 @@ class Plotter:
 					'quartile_3': percentile(results, 75),
 					'max': max(results),
 					'std': std(results),
+					'N': len(results),
 				}
 		
 		return summary
@@ -134,6 +135,7 @@ class Plotter:
 					'quartile_3': percentile(results, 75),
 					'max': max(results),
 					'std': std(results),
+					'N': len(results),
 				}
 
 		return summary
@@ -214,8 +216,7 @@ class Plotter:
 		"""
 		time_series = {}
 		time_key = 'year' if aggregate == 'yearly' else 'month'
-		time_series[time_key] = \
-			[span for span in self.summary[aggregate][dataset][field]]
+		time_series[time_key] = self.summary[aggregate][dataset][field]
 		stat_list = ['mean', 'std', 'median', 'quartile_1', 'quartile_3', 'max', 'min']
 		for stat in stat_list:
 			time_series[stat] = [
