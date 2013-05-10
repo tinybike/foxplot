@@ -47,10 +47,10 @@ def results(request):
 	json_histogram = {}
 	for field in ['bio', 'gro', 'bio_all', 'npp_wet', 'anpp']:
 		if log_y:
-			values = [None if j == 0 else log(j) for j in P.time_series[field]['mean']]
+			values = [None if j == 0 else log(j) for j in P.time_series[field][select_stat]]
 			data = zip(P.time_series[field]['year'], values)
 		else:
-			values = P.time_series[field]['mean']
+			values = P.time_series[field][select_stat]
 			if show_errors:
 				error_bars = P.time_series[field]['std']
 				data = zip(P.time_series[field]['year'], values, error_bars)
@@ -64,7 +64,6 @@ def results(request):
 		json_histogram[field] = {'label': field, 'data': hist_data}
 	
 	return render(request, 'visual/results.html', {
-		'select_stat': select_stat,
 		#'dataset': dataset,
 		#'table': table,
 		#'get_summary': get_summary,
