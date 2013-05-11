@@ -11,8 +11,6 @@ from math import log, sqrt
 
 def results(request):
 	
-	#dataset = request.POST['dataset']
-	#get_summary = True if 'get_summary' in request.POST.keys() else False
 	get_histogram = True if 'get_histogram' in request.POST.keys() else False
 	get_time_series = True if 'get_time_series' in request.POST.keys() else False
 	log_y = True if 'log_y' in request.POST.keys() else False
@@ -44,19 +42,7 @@ def results(request):
 	P.summary_stats()
 	P.fetch_data()
 	P.make_plots()
-	
-	#summary = zip(
-	#	P.summary['yearly'][table][dataset][2007].keys(), 
-	#	P.summary['yearly'][table][dataset][2007].values()
-	#)
-	#histogram = zip(P.hist['bin']['bio'], P.hist['percent']['bio'])
-	
-	#time_series = zip(
-	#	P.time_series[dataset]['year'],
-	#	P.time_series[dataset]['mean'],
-	#	P.time_series[dataset]['std']
-	#)
-	
+
 	if select_span == 'year':
 		time_series = P.time_series
 		field_list = ['bio', 'gro', 'bio_all', 'npp_wet', 'anpp']
@@ -69,31 +55,31 @@ def results(request):
 	field_list = filter(
 		None, [f if f in keep_fields else None for f in field_list]
 	)
-	
-	bin_list = [P.hist['bin'][field][1] - P.hist['bin'][field][0] \
-		for field in field_list]
-	bin_sizes = zip(field_list, bin_list)
-		
+
+	# Create prettier labels for the plots...
+	field_labels = {
+		'bio': 'bio @ PIE',
+		'gro': 'gro @ PIE',
+		'bio_all': 'bio_all @ HJA',
+		'npp_wet': 'npp_wet @ SBC',
+		'anpp': 'anpp @ HJA',
+	}
+	stat_labels = {
+		'max': 'Maximum',
+		'mean': 'Mean',
+		'median': 'Median',
+		'min': 'Minimum',
+		'quartile_1': '1st quartile',
+		'quartile_3': '3rd quartile',
+	}
+
 	json_time_series = {}
 	json_histogram = {}
 	for field in field_list:
+		# Get standard errors and zip time-series data into JSON-like dict 
+		# (for Flot)
 		time_key = 'yearly' if select_span == 'year' else 'aggregate'
 		this_summary = P.summary[time_key][table_dict[field]][field]
-		'''
-		if log_y:
-			values = [None if j <= 0 else log(j) \
-				for j in time_series[field][select_stat]]
-			if show_errors:
-				N = [this_summary[j]['N'] for j in this_summary.keys()]
-				error_bars = [None if j <= 0 else log(j/sqrt(N[i]-1)) \
-					for i, j in enumerate(time_series[field]['std'])]
-				period = time_series[field][select_span]
-				data = zip(period, values, error_bars)
-			else:
-				period = time_series[field][select_span]
-				data = zip(period, values)
-		else:
-		'''
 		values = time_series[field][select_stat]
 		if show_errors:
 			N = [this_summary[j]['N'] for j in this_summary.keys()]
@@ -104,10 +90,13 @@ def results(request):
 		else:
 			period = time_series[field][select_span]
 			data = zip(period, values)
-		
 		data = [list(j) for j in data]
-		json_time_series[field] = {'label': field, 'data': data}
+		json_time_series[field] = {
+			'label': field_labels[field], 
+			'data': data,
+		}
 		
+		# Zip histogram data into JSON-like dict (for Flot)
 		hist_x = P.hist['bin'][field]
 		hist_y = [None if j == 0 else j for j in P.hist['percent'][field]]
 		if hist_show_errors:
@@ -115,7 +104,21 @@ def results(request):
 		else:
 			hist_data = zip(hist_x, hist_y)
 		hist_data = [list(j) for j in hist_data]
-		json_histogram[field] = {'label': field, 'data': hist_data}
+		json_histogram[field] = {
+			'label': field_labels[field],
+			'data': hist_data,
+		}
+		
+		this_total = P.summary['total'][time_key][table_dict[field]][field]
+		total_summary = [
+			[
+				field_labels[field], 
+				stat_labels[key], 
+				this_total[key]['mean'], 
+				this_total[key]['std']
+			] 
+			for key in this_total.keys()
+		]
 	
 	return render(request, 'visual/results.html', {
 		#'dataset': dataset,
@@ -129,8 +132,8 @@ def results(request):
 		'log_y': log_y,
 		'hist_log_y': hist_log_y,
 		'hist_log_x': hist_log_x,
-		'bin_sizes': bin_sizes,
-		#'summary': summary,
+		#'bin_sizes': bin_sizes,
+		'summary': total_summary,
 		'num_bins': P.num_bins,
 		#'histogram': histogram,
 		#'time_series': time_series,

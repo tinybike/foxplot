@@ -12,36 +12,9 @@
 <script src="{% static 'visual/js/jquery.flot.js' %}"></script>
 <script src="{% static 'visual/js/jquery.flot.axislabels.js' %}"></script>
 <script src="{% static 'visual/js/jquery.flot.errorbars.js' %}"></script>
+<script src="{% static 'visual/js/canvas2image.js' %}"></script>
+<script src="{% static 'visual/js/base64.js' %}"></script>
 <script>
-function saveCanvas(canvas, destFile) {
-	// convert string filepath to an nsIFile
-	var file = Components.classes["@mozilla.org/file/local;1"]
-					   .createInstance(Components.interfaces.nsILocalFile);
-	file.initWithPath(destFile);
-
-	// create a data url from the canvas and then create URIs of the source and targets 
-	var io = Components.classes["@mozilla.org/network/io-service;1"]
-					 .getService(Components.interfaces.nsIIOService);
-	var source = io.newURI(canvas.toDataURL("image/png", ""), "UTF8", null);
-	var target = io.newFileURI(file)
-	 
-	// prepare to save the canvas data
-	var persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"]
-						  .createInstance(Components.interfaces.nsIWebBrowserPersist);
-
-	persist.persistFlags = Components.interfaces.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
-	persist.persistFlags |= Components.interfaces.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
-
-	// displays a download dialog (remove these 3 lines for silent download)
-	var xfer = Components.classes["@mozilla.org/transfer;1"]
-					   .createInstance(Components.interfaces.nsITransfer);
-	xfer.init(source, target, "", null, null, null, persist);
-	persist.progressListener = xfer;
-
-	// save the canvas data to the file
-	persist.saveURI(source, null, null, null, null, file);
-}
-
 $(function() {
 	/*var timeSeries = [];
 	var plusRange = [];
@@ -336,7 +309,6 @@ $(function() {
 				},
 				yaxis: {
 					min: yMin,
-					max: 100,
 					transform: transformYAxis,
 					inverseTransform: inverseTransformYAxis,
 					ticks: yTickMarks,
@@ -533,10 +505,19 @@ $(function() {
 				</ul>
 			{% endif %}--->
 			<!---<p class="announce">Time series</p>--->
+			<ul>
+			{% for field, stat, mean, std in total_summary %}
+				{% if forloop.counter0 == 0 %}
+					<li>{{ field }} </li>
+				{% endif %}
+				<li>{{ stat }}: {{ mean }} +/- {{ std }}</li>
+			{% endfor %}
+			</ul>
 			<div class="flot-container">
 				<div id="histogram_placeholder" class="flot-placeholder"></div>
 				<div id="time_series_placeholder" class="flot-placeholder"></div>
 			</div>
+			<a href="#" onclick="$('#histogram_placeholder').toDataURL('image/png'); return false;">save</a>
 		</div>
 	</div>
 	<div class="push"></div>

@@ -34,7 +34,33 @@ class Plotter:
 			'piedata': self.aggregated_stats('piedata', ['gro', 'bio']),
 		}
 		self.summary['total'] = {}
-
+		self.summary['total']['yearly'] = {
+			'hja_ws1_test': self.total_stats('yearly', 'hja_ws1_test', ['bio_all', 'anpp']),
+			'kelp_grow_npp': self.total_stats('yearly', 'kelp_grow_npp', ['npp_wet']),
+			'piedata': self.total_stats('yearly', 'piedata', ['gro', 'bio']),
+		}
+		self.summary['total']['aggregate'] = {
+			'kelp_grow_npp': self.total_stats('aggregate', 'kelp_grow_npp', ['npp_wet']),
+			'piedata': self.total_stats('aggregate', 'piedata', ['gro', 'bio']),
+		}
+	
+	def total_stats(self, period, dataset, fields):	
+		"""
+		Calculates a single set of statistics for an aggregated data set.
+		"""
+		summary = {}
+		stats = ('min', 'quartile_1', 'mean', 'median', 'quartile_3', 'max')
+		data = self.summary[period][dataset]
+		for field in fields:
+			summary[field] = {}
+			for stat in stats:
+				results = [data[field][key][stat] for key in data[field].keys()]
+				summary[field][stat] = {
+					'mean': mean(results),
+					'std': std(results),
+				}
+		return summary
+		
 	def aggregated_stats(self, dataset, fields):
 		"""
 		Calculates statistics aggregated across years for npp_wet, gro, and
