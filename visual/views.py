@@ -100,7 +100,9 @@ def results(request):
 		data = [list(j) for j in data]
 		json_time_series[field] = {'label': field, 'data': data}
 		
-		hist_data = zip(P.hist['bin'][field], P.hist['percent'][field])
+		hist_x = P.hist['bin'][field]
+		hist_y = [None if j == 0 else j for j in P.hist['percent'][field]]
+		hist_data = zip(hist_x, hist_y)
 		hist_data = [list(j) for j in hist_data]
 		json_histogram[field] = {'label': field, 'data': hist_data}
 	
