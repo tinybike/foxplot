@@ -15,6 +15,12 @@
 <script src="{% static 'visual/js/canvas2image.js' %}"></script>
 <script src="{% static 'visual/js/base64.js' %}"></script>
 <script>
+function toImage() {
+	var canvas = $('#histogram_placeholder');
+	document.getElementById("theimage").src = canvas.toDataURL();
+	Canvas2Image.saveAsPNG(canvas);
+}
+
 $(function() {
 	/*var timeSeries = [];
 	var plusRange = [];
@@ -517,7 +523,8 @@ $(function() {
 				<div id="histogram_placeholder" class="flot-placeholder"></div>
 				<div id="time_series_placeholder" class="flot-placeholder"></div>
 			</div>
-			<a href="#" onclick="$('#histogram_placeholder').toDataURL('image/png'); return false;">save</a>
+			<!---<image id="theimage"></image>
+			<a href="#" onclick="toImage()">save</a>--->
 		</div>
 	</div>
 	<div class="push"></div>
