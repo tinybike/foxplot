@@ -181,7 +181,7 @@ class Plotter:
 		"""
 		Calculate histograms and time series.
 		"""	
-		self.hist['percent'], self.hist['bin'] = {}, {}
+		self.hist['percent'], self.hist['bin'], self.hist['std'] = {}, {}, {}
 		dataset_field = zip(
 			[
 				'hja_ws1_test', 'piedata', 'kelp_grow_npp', 
@@ -190,7 +190,7 @@ class Plotter:
 			['bio_all', 'bio', 'npp_wet', 'anpp', 'gro']
 		)
 		for dataset, field in dataset_field:
-			self.hist['percent'][field], self.hist['bin'][field] = \
+			self.hist['percent'][field], self.hist['bin'][field], self.hist['std'][field] = \
 				self.get_histogram(dataset, field)
 			self.time_series[field] = self.get_time_series(dataset, field)
 			if field in ['bio', 'gro', 'npp_wet']:
@@ -204,11 +204,18 @@ class Plotter:
 		counts, bin_edges = histogram(
 			self.data[dataset][field], bins=self.num_bins
 		)
+		bin_std = []
+		for i in xrange(self.num_bins):
+			bin_std.append(std(filter(
+				None, 
+				[j if (j >= bin_edges[i] and j < bin_edges[i+1]) \
+					else None for j in self.data[dataset][field]]
+			)))
 		total_count = sum(counts)
 		percentages = [100*count/total_count for count in counts]
 		bin_centers = [0.5*(bin_edges[j]+bin_edges[j+1]) \
 			for j in xrange(self.num_bins)]
-		return percentages, bin_centers
+		return percentages, bin_centers, bin_std
 
 	def get_time_series(self, dataset, field, aggregate='yearly'):
 		"""

@@ -19,10 +19,12 @@ def results(request):
 	hist_log_y = True if 'hist_log_y' in request.POST.keys() else False
 	hist_log_x = True if 'hist_log_x' in request.POST.keys() else False
 	show_errors = True if 'show_errors' in request.POST.keys() else False
+	hist_show_errors = True if 'hist_show_errors' in request.POST.keys() else False
 	select_stat = request.POST['select_stat']
 	select_span = request.POST['select_span']
 	num_bins = int(request.POST['num_bins'])
 	align_start = True if 'align_start' in request.POST.keys() else False
+	bio_or_npp = request.POST['bio_or_npp']
 	
 	table_dict = {
 		'bio': 'piedata',
@@ -61,6 +63,12 @@ def results(request):
 	else:
 		time_series = P.monthly_time_series
 		field_list = ['bio', 'gro', 'npp_wet']
+	
+	keep_fields = ['gro', 'npp_wet', 'anpp'] if bio_or_npp == 'npp' \
+		else ['bio', 'bio_all']
+	field_list = filter(
+		None, [f if f in keep_fields else None for f in field_list]
+	)
 	
 	bin_list = [P.hist['bin'][field][1] - P.hist['bin'][field][0] \
 		for field in field_list]
@@ -102,7 +110,10 @@ def results(request):
 		
 		hist_x = P.hist['bin'][field]
 		hist_y = [None if j == 0 else j for j in P.hist['percent'][field]]
-		hist_data = zip(hist_x, hist_y)
+		if hist_show_errors:
+			hist_data = zip(hist_x, hist_y, P.hist['std'][field])
+		else:
+			hist_data = zip(hist_x, hist_y)
 		hist_data = [list(j) for j in hist_data]
 		json_histogram[field] = {'label': field, 'data': hist_data}
 	
@@ -114,6 +125,7 @@ def results(request):
 		#'get_time_series': get_time_series,
 		'select_span': select_span,
 		'show_errors': show_errors,
+		'hist_show_errors': hist_show_errors,
 		'log_y': log_y,
 		'hist_log_y': hist_log_y,
 		'hist_log_x': hist_log_x,

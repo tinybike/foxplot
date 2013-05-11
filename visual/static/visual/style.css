@@ -393,6 +393,11 @@ hr {
 	padding-bottom: 15px;
 }
 
+#bio_or_npp {
+	padding-top: 5px;
+	border-bottom: 1px solid #777;
+}
+
 /**
 * Button CSS
 */

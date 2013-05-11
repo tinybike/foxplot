@@ -67,9 +67,9 @@ $(function() {
 	choiceContainer.find("input").click(plotAccordingToChoices);
 	
 	{% if show_errors  %}
-		showErrors = true;
+		var showErrors = true;
 	{% else %}
-		showErrors = false;
+		var showErrors = false;
 	{% endif %}
 	
 	var tsPoints = (showErrors) ? {
@@ -120,12 +120,14 @@ $(function() {
 		inverseTransformAxis = function(x) {
 			return Math.exp(x);
 		}
+		tickMarks = [[0.001, "0.001"], [0.01, "0.01"], [0.1, "0.1"], [1, "1"], [10, "10"], [100, "100"], [1000, "1000"]];
 	{% else %}
 		log_y = false;
 		transformAxis = function(x) {
 			return x;
 		}
 		inverseTransformAxis = transformAxis;
+		tickMarks = null;
 	{% endif %}
 	
 	function plotAccordingToChoices() {
@@ -152,7 +154,8 @@ $(function() {
 				yaxis: {
 					position: "right",
 					transform: transformAxis,
-					inverseTransform: inverseTransformAxis
+					inverseTransform: inverseTransformAxis,
+					ticks: tickMarks
 				},
 				grid: {
 					color: "white",
@@ -161,6 +164,8 @@ $(function() {
 					markingsColor: "white",
 					hoverable: true,
 					clickable: true
+					//markings: [ { yaxis: { from: 0, to: 0 }, color: "white" },
+                      // { xaxis: { from: 0, to: 0 }, color: "white" }]
 				},
 				legend: {
 					show: false
@@ -195,13 +200,8 @@ $(function() {
 				$("#tooltip").remove();
 				var x = item.datapoint[0].toFixed(2),
 				y = item.datapoint[1].toFixed(2);
-				{% if log_y %}
-					showTooltip(item.pageX, item.pageY,
-						"log(" + item.series.label + ") = " + y + " in year " + parseInt(x));
-				{% else %}
-					showTooltip(item.pageX, item.pageY,
-						item.series.label + " = " + y + " in year " + parseInt(x));
-				{% endif %}
+				showTooltip(item.pageX, item.pageY,
+					item.series.label + " = " + y + " in year " + parseInt(x));
 			}
 		} else {
 			$("#tooltip").remove();
@@ -249,12 +249,16 @@ $(function() {
 		inverseTransformYAxis = function(y) {
 			return Math.exp(y);
 		}
+		yTickMarks = [[1, "1"], [10, "10"], [100, "100"]];
+		yMin = 0.01;
 	{% else %}
 		hist_log_y = false
 		transformYAxis = function(y) {
 			return y;
 		}
 		inverseTransformYAxis = transformYAxis;
+		yTickMarks = null;
+		yMin = 0;
 	{% endif %}
 	{% if hist_log_x %}
 		log_x = true
@@ -264,14 +268,38 @@ $(function() {
 		inverseTransformXAxis = function(x) {
 			return Math.exp(x);
 		}
+		xTickMarks = [[0.01, "0.01"], [0.1, "0.1"], [1, "1"], [10, "10"], [100, "100"], [1000, "1000"]];
 	{% else %}
 		hist_log_x = false
 		transformXAxis = function(x) {
 			return x;
 		}
 		inverseTransformXAxis = transformXAxis;
+		xTickMarks = null;
 	{% endif %}
 
+	{% if hist_show_errors  %}
+		var showErrors = true;
+	{% else %}
+		var showErrors = false;
+	{% endif %}
+	
+	var histPoints = (showErrors) ? {
+		show: true,
+		radius: 3,
+		errorbars: 'x',
+		xerr: {
+			show: true, 
+			lineWidth: 1, 
+			upperCap: '-', 
+			lowerCap: '-', 
+			radius: 5
+		}
+	} : {
+		show: true,
+		radius: 3
+	};
+	
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -282,15 +310,21 @@ $(function() {
 		});
 		if (data.length > 0) {
 			$.plot("#histogram_placeholder", data, {
-				bars: {
+				/*bars: {
 					show: false,
 					barWidth: 10 //histogram[1][0] - histogram[0][0]
 				},
 				lines: {
-					show: false
+					show: true
 				},
 				points: {
 					show: true
+				},*/
+				series: {
+					lines: {
+						show: true
+					},
+					points: histPoints
 				},
 				grid: {
 					color: "white",
@@ -301,14 +335,18 @@ $(function() {
 					clickable: true
 				},
 				yaxis: {
+					min: yMin,
+					max: 100,
 					transform: transformYAxis,
 					inverseTransform: inverseTransformYAxis,
+					ticks: yTickMarks,
 					axisLabel: '%',
 					axisLabelUseCanvas: false
 				},
 				xaxis: {
 					transform: transformXAxis,
 					inverseTransform: inverseTransformXAxis,
+					ticks: xTickMarks,
 					axisLabel: 'Value',
 					axisLabelUseCanvas: false
 				},
@@ -412,10 +450,18 @@ $(function() {
 	<div id="plotter_page" class="container">
 		<div id="leftbar">
 			<div id="fetch_data">
-				<p class="boxheader">Time series options</p>
 				<form action="/visual/results/" method="post">
+				{% csrf_token %}
+				<div id="bio_or_npp">
+					<ul>
+						<li>
+						<input type="radio" name="bio_or_npp" value="biomass" checked="checked" /> Biomass
+						<input type="radio" name="bio_or_npp" value="npp" /> NPP
+						</li>
+					</ul>
+				</div>
+				<p class="boxheader">Time series</p>
 				<ul>
-					{% csrf_token %}
 					<!---<li>
 						Dataset:
 						<select name="dataset" id="dataset">
@@ -452,7 +498,7 @@ $(function() {
 					="checked" /> Log-transform</li>
 					<li><input type="checkbox" value="Yes" name="align_start" id="align_start" /> Align start times</li>
 				</ul>
-				<p class="boxheader">Histogram options</p>
+				<p class="boxheader">Histogram</p>
 				<ul>
 				<li>Number of bins:&nbsp;&nbsp;<input type="text" size="1" value="25" name="num_bins" id="num_bins" /></li>
 				<!---<li>
@@ -464,7 +510,7 @@ $(function() {
 					<option value="pointslines">points + lines</option>
 				</select>
 				</li>--->
-				<li><input type="checkbox" value="Yes" name="hist_show_errors" id="hist_show_errors" /> Error bars (NYI)</li>
+				<li><input type="checkbox" value="Yes" name="hist_show_errors" id="hist_show_errors" /> Error bars</li>
 				<li><input type="checkbox" value="Yes" name="hist_log_x" id="hist_log_x" /> Log-transform x-axis</li>
 				<li><input type="checkbox" value="Yes" name="hist_log_y" id="hist_log_y" /> Log-transform y-axis</li>
 				</ul>
