@@ -398,6 +398,18 @@ hr {
 	border-bottom: 1px solid #777;
 }
 
+#total_summary table {
+	color: #fff;
+	border: 1px solid #777;
+	margin-top: 0;
+}
+#total_summary th {
+	text-align: left;
+	border-top: 1px solid #777;
+	border-bottom: 1px solid #777;
+	padding-top: 0;
+}
+
 /**
 * Button CSS
 */
