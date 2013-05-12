@@ -75,7 +75,7 @@ def results(request):
 
 	json_time_series = {}
 	json_histogram = {}
-	total_summary = []
+	total_summary, total_labels = [], []
 	for field in field_list:
 		# Get standard errors and zip time-series data into JSON-like dict 
 		# (for Flot)
@@ -111,15 +111,17 @@ def results(request):
 		}
 		
 		this_total = P.summary['total'][time_key][table_dict[field]][field]
+		total_labels.append(field_labels[field])
 		total_summary.append([
 			[
-				field_labels[field], 
+				#field_labels[field], 
 				stat_labels[key], 
-				this_total[key]['mean'], 
-				this_total[key]['std']
+				repr(round(this_total[key]['mean']*1000.0)/1000.0), 
+				repr(round(this_total[key]['std']*1000.0)/1000.0)
 			] 
 			for key in this_total.keys()
 		])
+	summary = zip(total_labels, total_summary)
 	
 	return render(request, 'visual/results.html', {
 		#'dataset': dataset,
@@ -134,7 +136,7 @@ def results(request):
 		'hist_log_y': hist_log_y,
 		'hist_log_x': hist_log_x,
 		#'bin_sizes': bin_sizes,
-		'summary': total_summary,
+		'summary': summary,
 		'num_bins': P.num_bins,
 		#'histogram': histogram,
 		#'time_series': time_series,

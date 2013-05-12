@@ -395,19 +395,40 @@ hr {
 
 #bio_or_npp {
 	padding-top: 5px;
-	border-bottom: 1px solid #777;
 }
 
+#total_summary {
+	width: 100%;
+	/*padding-right: 10px;
+	padding-left: 10px;
+	padding-top: 5px;*/
+}
 #total_summary table {
 	color: #fff;
-	border: 1px solid #777;
 	margin-top: 0;
 }
+#table-1 {
+	float: left;
+}
+#table-2 {
+	float: right;
+}
+#table-3 {
+	margin: auto;
+}
+.statistic {
+	font-weight: bold;
+}
+#total_summary td {
+	width: 150px;
+}
 #total_summary th {
+	/*width: 350px;*/
 	text-align: left;
-	border-top: 1px solid #777;
-	border-bottom: 1px solid #777;
 	padding-top: 0;
+}
+.statistic_header {
+	font-size: 120%;
 }
 
 /**

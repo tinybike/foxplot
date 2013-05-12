@@ -16,8 +16,8 @@
 <script src="{% static 'visual/js/base64.js' %}"></script>
 <script>
 function toImage() {
-	var canvas = $('#histogram_placeholder');
-	document.getElementById("theimage").src = canvas.toDataURL();
+	var canvas = document.getElementById('histogram_placeholder');
+	document.getElementById('theimage').src = canvas.toDataURL();
 	Canvas2Image.saveAsPNG(canvas);
 }
 
@@ -502,14 +502,21 @@ $(function() {
 			</div>
 		</div>
 		<div id="total_summary">
-		<table>
-		{% for field, stat, mean, std in summary %}
-			{% if forloop.counter0 == 0 %}
-				<tr><th></th><th>{{ field }}</th></tr>
-			{% endif %}
-			<tr><td>{{ stat }}:</td><td>{{ mean }} +/- {{ std }}</td></tr>
+		{% for field, total_summary in summary %}
+			<table id="table-{{ forloop.counter }}">
+			<tr><td></td><th><span class="statistic_header">{{ field }}</span></th></tr>
+			{% for stat, mean, std in total_summary %}
+				<tr>
+				{% if forloop.parentloop.counter == 1 %}
+					<td class="statistic"><span class="statistic">{{ stat }}</span></td>
+				{% else %}
+					<td>&nbsp;</td>
+				{% endif %}
+				<td class="data">{{ mean }} +/- {{ std }}</td>
+				</tr>
+			{% endfor %}
+			</table>
 		{% endfor %}
-		</table>
 		</div>
 		<div id="plotter">
 			<!---{% if get_summary %}
