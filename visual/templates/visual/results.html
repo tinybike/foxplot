@@ -427,9 +427,17 @@ $(function() {
 	<div id="banner-wrapper">
 		<center>
 		<div class="summary-container">
-			<div id="total_summary">
+			{% if bio_or_npp == 'npp' %}
+				<div id="total_summary" style="width: 80%;">
+			{% else %}
+				<div id="total_summary" style="width: 50%;">
+			{% endif %}
 			{% for field, total_summary in summary %}
-				<table id="table-{{ forloop.counter }}">
+				{% if forloop.counter == 2 and bio_or_npp == 'biomass' %}
+					<table id="table-3">
+				{% else %}
+					<table id="table-{{ forloop.counter }}">
+				{% endif %}
 				<tr><td></td><th><span class="statistic_header">{{ field }}</span></th></tr>
 				{% for stat, mean, std in total_summary %}
 					<tr>
@@ -442,6 +450,17 @@ $(function() {
 					</tr>
 				{% endfor %}
 				</table>
+				{% if forloop.counter == 2 and bio_or_npp == 'biomass' %}
+					<table id="table-2">
+						<tr><td></td><th><span class="statistic_header">&nbsp;</span></th></tr>
+						<tr><td class="data">&nbsp;</td></tr>
+						<tr><td class="data">&nbsp;</td></tr>
+						<tr><td class="data">&nbsp;</td></tr>
+						<tr><td class="data">&nbsp;</td></tr>
+						<tr><td class="data">&nbsp;</td></tr>
+						<tr><td class="data">&nbsp;</td></tr>
+					</table>
+				{% endif %}
 			{% endfor %}
 			</div>
 		</div>

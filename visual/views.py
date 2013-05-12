@@ -138,6 +138,7 @@ def results(request):
 		#'bin_sizes': bin_sizes,
 		'summary': summary,
 		'num_bins': P.num_bins,
+		'bio_or_npp': bio_or_npp,
 		#'histogram': histogram,
 		#'time_series': time_series,
 		'json_time_series': json.dumps(json_time_series),

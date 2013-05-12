@@ -400,10 +400,10 @@ hr {
 
 #bio_or_npp {
 	padding-top: 5px;
+	border-bottom: 1px solid #777;
 }
 
 #total_summary {
-	width: 80%;
 	padding-left: 10px;
 	padding-bottom: 10px;
 	padding-top: 3px;
