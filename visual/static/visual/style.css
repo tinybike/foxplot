@@ -90,6 +90,11 @@ hr {
 	margin: 0px auto;
 }
 
+.summary-container {
+	width: 1200px;
+	margin: auto;
+}
+
 .clearfix {
 	clear: both;
 }
@@ -398,10 +403,13 @@ hr {
 }
 
 #total_summary {
-	width: 100%;
-	/*padding-right: 10px;
+	width: 80%;
 	padding-left: 10px;
-	padding-top: 5px;*/
+	padding-bottom: 10px;
+	padding-top: 3px;
+	margin-top: 5px;
+	background: rgb(35, 35, 35); /* default fallback */
+	background: rgba(25, 25, 25, 0.8); /* nice browsers */
 }
 #total_summary table {
 	color: #fff;
@@ -420,7 +428,7 @@ hr {
 	font-weight: bold;
 }
 #total_summary td {
-	width: 150px;
+	width: 175px;
 }
 #total_summary th {
 	/*width: 350px;*/

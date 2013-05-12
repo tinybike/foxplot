@@ -424,7 +424,30 @@ $(function() {
 			</div>
 		</div>
 	</div>
-	<div id="banner-wrapper"></div>
+	<div id="banner-wrapper">
+		<center>
+		<div class="summary-container">
+			<div id="total_summary">
+			{% for field, total_summary in summary %}
+				<table id="table-{{ forloop.counter }}">
+				<tr><td></td><th><span class="statistic_header">{{ field }}</span></th></tr>
+				{% for stat, mean, std in total_summary %}
+					<tr>
+					{% if forloop.parentloop.counter == 1 %}
+						<td class="statistic"><span class="statistic">{{ stat }}</span></td>
+					{% else %}
+						<td>&nbsp;</td>
+					{% endif %}
+					<td class="data">{{ mean }} &plusmn; {{ std }}</td>
+					</tr>
+				{% endfor %}
+				</table>
+			{% endfor %}
+			</div>
+		</div>
+		</center>
+	</div>
+
 	<div id="plotter_page" class="container">
 		<div id="leftbar">
 			<div id="fetch_data">
@@ -500,23 +523,6 @@ $(function() {
 			<div id="choices">
 				<p class="boxheader">Datasets</p>
 			</div>
-		</div>
-		<div id="total_summary">
-		{% for field, total_summary in summary %}
-			<table id="table-{{ forloop.counter }}">
-			<tr><td></td><th><span class="statistic_header">{{ field }}</span></th></tr>
-			{% for stat, mean, std in total_summary %}
-				<tr>
-				{% if forloop.parentloop.counter == 1 %}
-					<td class="statistic"><span class="statistic">{{ stat }}</span></td>
-				{% else %}
-					<td>&nbsp;</td>
-				{% endif %}
-				<td class="data">{{ mean }} +/- {{ std }}</td>
-				</tr>
-			{% endfor %}
-			</table>
-		{% endfor %}
 		</div>
 		<div id="plotter">
 			<!---{% if get_summary %}
