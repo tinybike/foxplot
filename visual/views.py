@@ -128,6 +128,14 @@ def results(request):
 		])
 	summary = zip(total_labels, total_summary)
 	
+	bar_width = P.hist['bin']['npp_wet'][1] - P.hist['bin']['npp_wet'][0]
+	
+	bio_or_npp_dict = {
+		'biomass': '<strong>Biomass</strong> (g/m<sup>2</sup>)',
+		'npp': '<strong>NPP</strong> (g/m<sup>2</sup>/year)',
+	}
+	bio_or_npp_label = bio_or_npp_dict[bio_or_npp]
+	
 	return render(request, 'visual/results.html', {
 		#'dataset': dataset,
 		#'table': table,
@@ -138,12 +146,14 @@ def results(request):
 		'show_errors': show_errors,
 		'hist_show_errors': hist_show_errors,
 		'log_y': log_y,
+		'bar_width': bar_width,
 		'hist_log_y': hist_log_y,
 		'hist_log_x': hist_log_x,
 		#'bin_sizes': bin_sizes,
 		'summary': summary,
 		'num_bins': P.num_bins,
 		'bio_or_npp': bio_or_npp,
+		'bio_or_npp_label': bio_or_npp_label,
 		#'histogram': histogram,
 		#'time_series': time_series,
 		'json_time_series': json.dumps(json_time_series),

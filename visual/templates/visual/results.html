@@ -131,6 +131,7 @@ $(function() {
 					axisLabelUseCanvas: false
 				},
 				yaxis: {
+					//max: 625,
 					position: "right",
 					transform: transformAxis,
 					inverseTransform: inverseTransformAxis,
@@ -154,6 +155,12 @@ $(function() {
 			});
 		}
 	}
+	
+	{% if bio_or_npp == 'biomass' %}
+		tsYAxisLabel = 'g/m2';
+	{% else %}
+		tsYAxisLabel = 'g/m<sup>2</sup>/year';
+	{% endif %}
 	
 	plotAccordingToChoices();
 
@@ -180,7 +187,7 @@ $(function() {
 				var x = item.datapoint[0].toFixed(2),
 				y = item.datapoint[1].toFixed(2);
 				showTooltip(item.pageX, item.pageY,
-					item.series.label + " = " + y + " in year " + parseInt(x));
+					item.series.label + " = " + y + " " + tsYAxisLabel + " in year " + parseInt(x));
 			}
 		} else {
 			$("#tooltip").remove();
@@ -275,15 +282,19 @@ $(function() {
 			radius: 5
 		}
 	} : {
-		show: true,
+		show: false, // change to true?
 		radius: 3
 	};
+	
+	var showBars = (showErrors) ? false : true;
 	
 	{% if bio_or_npp == 'biomass' %}
 		histXAxisLabel = 'g/m2';
 	{% else %}
 		histXAxisLabel = 'g/m<sup>2</sup>/year';
 	{% endif %}
+	
+	histBarWidth = {{ bar_width }};
 	
 	function plotAccordingToChoices() {
 		var data = [];
@@ -296,8 +307,8 @@ $(function() {
 		if (data.length > 0) {
 			$.plot("#histogram_placeholder", data, {
 				bars: {
-					show: false,
-					barWidth: 10 //histogram[1][0] - histogram[0][0]
+					show: showBars,
+					barWidth: histBarWidth
 				},
 				/*lines: {
 					show: true
@@ -307,7 +318,7 @@ $(function() {
 				},*/
 				series: {
 					lines: {
-						show: true
+						show: showErrors
 					},
 					points: histPoints
 				},
@@ -444,7 +455,14 @@ $(function() {
 				{% else %}
 					<table id="table-{{ forloop.counter }}">
 				{% endif %}
-				<tr><td></td><th><span class="statistic_header">{{ field }}</span></th></tr>
+				<tr>
+				{% if forloop.counter == 1 %}
+					<td><span style="font-size: 105%; padding-right: 25px; border-right: 1px solid #777; border-bottom: 1px solid #777;">{{ bio_or_npp_label|safe }}</span></td>
+				{% else %}
+					<th></th>
+				{% endif %}
+				<th><span class="statistic_header">{{ field }}</span></th>
+				</tr>
 				{% for stat, mean, std in total_summary %}
 					<tr>
 					{% if forloop.parentloop.counter == 1 %}
