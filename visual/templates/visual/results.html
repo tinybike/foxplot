@@ -304,52 +304,63 @@ $(function() {
 				data.push(datasets[key]);
 			}
 		});
+		var regularOptions = {
+			bars: {
+				show: showBars,
+				barWidth: histBarWidth
+			},
+			/*lines: {
+				show: true
+			},
+			points: {
+				show: true
+			},*/
+			series: {
+				lines: {
+					show: showErrors
+				},
+				points: histPoints
+			},
+			grid: {
+				color: "white",
+				borderWidth: 1,
+				borderColor: "#777",
+				markingsColor: "white",
+				hoverable: true,
+				clickable: true
+			},
+			yaxis: {
+				min: yMin,
+				transform: transformYAxis,
+				inverseTransform: inverseTransformYAxis,
+				ticks: yTickMarks,
+				axisLabel: '%',
+				axisLabelUseCanvas: false
+			},
+			xaxis: {
+				transform: transformXAxis,
+				inverseTransform: inverseTransformXAxis,
+				ticks: xTickMarks,
+				axisLabel: histXAxisLabel,
+				axisLabelUseCanvas: false
+			},
+			legend: {
+				position: "ne",
+				backgroundOpacity: 0.15
+			}
+		}
+		var options = $.extend(true, {}, regularOptions, 
+			{ hooks: { processRawData: function(a, b, c, d) {
+			  b.datapoints.format = [
+						   { x: true, number: true, required: true },
+						   { y: true, number: true, required: true },
+						   { y: true, number: true, required: false, defaultValue: 0 },
+						   { x: false, number: true, required: false } // <=== THIS IS NEW
+									];
+							}
+			} });
 		if (data.length > 0) {
-			$.plot("#histogram_placeholder", data, {
-				bars: {
-					show: showBars,
-					barWidth: histBarWidth
-				},
-				/*lines: {
-					show: true
-				},
-				points: {
-					show: true
-				},*/
-				series: {
-					lines: {
-						show: showErrors
-					},
-					points: histPoints
-				},
-				grid: {
-					color: "white",
-					borderWidth: 1,
-					borderColor: "#777",
-					markingsColor: "white",
-					hoverable: true,
-					clickable: true
-				},
-				yaxis: {
-					min: yMin,
-					transform: transformYAxis,
-					inverseTransform: inverseTransformYAxis,
-					ticks: yTickMarks,
-					axisLabel: '%',
-					axisLabelUseCanvas: false
-				},
-				xaxis: {
-					transform: transformXAxis,
-					inverseTransform: inverseTransformXAxis,
-					ticks: xTickMarks,
-					axisLabel: histXAxisLabel,
-					axisLabelUseCanvas: false
-				},
-				legend: {
-					position: "ne",
-					backgroundOpacity: 0.15
-				}
-			});
+			$.plot("#histogram_placeholder", data, options);
 		}
 	}
 	

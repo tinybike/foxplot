@@ -100,6 +100,8 @@ def results(request):
 		
 		# Zip histogram data into JSON-like dict (for Flot)
 		hist_x = P.hist['bin'][field]
+		bar_width = P.hist['bin'][field][1] - P.hist['bin'][field][0]
+		hist_bar_width = [bar_width for j in hist_x]
 		if hist_log_y:
 			hist_y = [None if j == 0 else j for j in P.hist['percent'][field]]
 		else:
@@ -108,7 +110,8 @@ def results(request):
 			hist_errors = [0 if isnan(j) else j for j in P.hist['std'][field]]
 			hist_data = zip(hist_x, hist_y, hist_errors)
 		else:
-			hist_data = zip(hist_x, hist_y)
+			hist_errors = [0 for j in hist_y]
+			hist_data = zip(hist_x, hist_y, hist_errors, hist_bar_width)
 		hist_data = [list(j) for j in hist_data]
 		json_histogram[field] = {
 			'label': field_labels[field],
@@ -136,6 +139,15 @@ def results(request):
 	}
 	bio_or_npp_label = bio_or_npp_dict[bio_or_npp]
 	
+	if bio_or_npp == 'biomass':
+		json_histogram_1 = json_histogram['bio']
+		json_histogram_2 = json_histogram['bio_all']
+		json_histogram_3 = None
+	else:
+		json_histogram_1 = json_histogram['gro']
+		json_histogram_2 = json_histogram['npp_wet']
+		json_histogram_3 = json_histogram['anpp']
+		
 	return render(request, 'visual/results.html', {
 		#'dataset': dataset,
 		#'table': table,
@@ -158,6 +170,9 @@ def results(request):
 		#'time_series': time_series,
 		'json_time_series': json.dumps(json_time_series),
 		'json_histogram': json.dumps(json_histogram),
+		'json_histogram_1': json.dumps(json_histogram_1),
+		'json_histogram_2': json.dumps(json_histogram_2),
+		'json_histogram_3': json.dumps(json_histogram_3),
 	})
 
 def index(request):

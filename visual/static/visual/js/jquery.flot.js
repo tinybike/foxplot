@@ -2504,6 +2504,8 @@ Licensed under the MIT license.
                 for (var i = 0; i < points.length; i += ps) {
                     if (points[i] == null)
                         continue;
+					var br = points[i + 3] && points[i + 3] > 0 ? barLeft + points[i
++ 3] : barRight;
                     drawBar(points[i], points[i + 1], points[i + 2], barLeft, barRight, offset, fillStyleCallback, axisx, axisy, ctx, series.bars.horizontal, series.bars.lineWidth);
                 }
             }
