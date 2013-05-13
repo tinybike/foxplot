@@ -154,6 +154,7 @@ def results(request):
 		#'get_summary': get_summary,
 		#'get_histogram': get_histogram,
 		#'get_time_series': get_time_series,
+		'select_stat': select_stat,
 		'select_span': select_span,
 		'show_errors': show_errors,
 		'hist_show_errors': hist_show_errors,
