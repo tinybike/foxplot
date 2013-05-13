@@ -94,12 +94,12 @@ $(function() {
 	{% if log_y %}
 		log_y = true;
 		transformAxis = function(x) {
-			return Math.log(x+0.0001);
+			return Math.log(x+0.01);
 		}
 		inverseTransformAxis = function(x) {
 			return Math.exp(x);
 		}
-		tickMarks = [[0.001, "0.001"], [0.01, "0.01"], [0.1, "0.1"], [1, "1"], [10, "10"], [100, "100"], [1000, "1000"]];
+		tickMarks = [[0.1, "0.1"], [1, "1"], [10, "10"], [100, "100"], [1000, "1000"]];
 	{% else %}
 		log_y = false;
 		transformAxis = function(x) {
@@ -279,6 +279,12 @@ $(function() {
 		radius: 3
 	};
 	
+	{% if bio_or_npp == 'biomass' %}
+		histXAxisLabel = 'g/m2';
+	{% else %}
+		histXAxisLabel = 'g/m<sup>2</sup>/year';
+	{% endif %}
+	
 	function plotAccordingToChoices() {
 		var data = [];
 		choiceContainer.find("input:checked").each(function () {
@@ -289,11 +295,11 @@ $(function() {
 		});
 		if (data.length > 0) {
 			$.plot("#histogram_placeholder", data, {
-				/*bars: {
+				bars: {
 					show: false,
 					barWidth: 10 //histogram[1][0] - histogram[0][0]
 				},
-				lines: {
+				/*lines: {
 					show: true
 				},
 				points: {
@@ -325,7 +331,7 @@ $(function() {
 					transform: transformXAxis,
 					inverseTransform: inverseTransformXAxis,
 					ticks: xTickMarks,
-					axisLabel: 'Value',
+					axisLabel: histXAxisLabel,
 					axisLabelUseCanvas: false
 				},
 				legend: {
@@ -361,7 +367,7 @@ $(function() {
 				var x = item.datapoint[0].toFixed(2),
 				y = item.datapoint[1].toFixed(2);
 				showTooltip(item.pageX, item.pageY,
-					y + "% chance of " + item.series.label + " = " + x);
+					y + "% chance of " + item.series.label + " = " + x + " " + histXAxisLabel);
 			}
 		} else {
 			$("#tooltip").remove();

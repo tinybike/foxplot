@@ -8,6 +8,7 @@ try:
 except ImportError:
 	import simplejson as json
 from math import log, sqrt
+from numpy import isnan
 
 def results(request):
 	
@@ -58,11 +59,11 @@ def results(request):
 
 	# Create prettier labels for the plots...
 	field_labels = {
-		'bio': 'bio @ PIE',
-		'gro': 'gro @ PIE',
-		'bio_all': 'bio_all @ HJA',
-		'npp_wet': 'npp_wet @ SBC',
-		'anpp': 'anpp @ HJA',
+		'bio': 'PIE',
+		'gro': 'PIE',
+		'bio_all': 'HJA',
+		'npp_wet': 'SBC',
+		'anpp': 'HJA',
 	}
 	stat_labels = {
 		'max': 'Maximum',
@@ -99,9 +100,13 @@ def results(request):
 		
 		# Zip histogram data into JSON-like dict (for Flot)
 		hist_x = P.hist['bin'][field]
-		hist_y = [None if j == 0 else j for j in P.hist['percent'][field]]
+		if hist_log_y:
+			hist_y = [None if j == 0 else j for j in P.hist['percent'][field]]
+		else:
+			hist_y = P.hist['percent'][field]
 		if hist_show_errors:
-			hist_data = zip(hist_x, hist_y, P.hist['std'][field])
+			hist_errors = [0 if isnan(j) else j for j in P.hist['std'][field]]
+			hist_data = zip(hist_x, hist_y, hist_errors)
 		else:
 			hist_data = zip(hist_x, hist_y)
 		hist_data = [list(j) for j in hist_data]

@@ -147,7 +147,7 @@ class Plotter:
 				if field == 'npp_wet':
 					adjustment = 3650
 				elif field == 'bio_all' or field == 'anpp':
-					adjustment = 0.01
+					adjustment = 10 #0.01
 				else:
 					adjustment = 1
 				results = [row[0]*adjustment for row in self.cursor.fetchall()]
@@ -199,8 +199,8 @@ class Plotter:
 		results = self.cursor.fetchall()
 		self.data['hja_ws1_test'] = {
 			'year': [row[0] for row in results],
-			'bio_all': [row[1]*0.01 for row in results],
-			'anpp': [row[2]*0.01 for row in results],
+			'bio_all': [row[1]*10 for row in results], # 0.01?
+			'anpp': [row[2]*10 for row in results], # 0.01
 		}
 
 	def make_plots(self):
