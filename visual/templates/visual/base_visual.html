@@ -1,11 +1,11 @@
-{% extends "visual/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}dataRonin visualization{% endblock %}
 
 {% block content %}
 <div id="plotter_page" class="container">
-	{% block fetchplot %}
-	{% endblock %}
+	{% block fetchplot %}{% endblock %}
+	{% block showplot %}{% endblock %}
 </div>
 {% endblock %}
 {% block footer %}
