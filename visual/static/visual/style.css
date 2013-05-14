@@ -408,8 +408,8 @@ hr {
 	padding-bottom: 10px;
 	padding-top: 3px;
 	margin-top: 5px;
-	background: rgb(35, 35, 35); /* default fallback */
-	background: rgba(25, 25, 25, 0.8); /* nice browsers */
+	background: rgb(35, 35, 35);
+	background: rgba(25, 25, 25, 0.8);
 }
 #total_summary table {
 	color: #fff;
@@ -443,7 +443,7 @@ hr {
 * Button CSS
 */
 
-.button, .small_button, .medium_button {
+.small_button {
     padding: 7px 12px 7px 12px;
     text-transform: uppercase;
     font-size: 11px;
@@ -453,128 +453,19 @@ hr {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    background: url("https://d3l0iz7q6gnphu.cloudfront.net/assets/buttons/buttons-0ce2d40b1facf6b1a69d16b1a4dd8d7a.png") repeat-x top left;
+    background: url("images/buttons-small-full.png") repeat-x top left;
 }
-input.button, input.button:active, input.button:disabled {
-    padding: 6px 12px 6px 12px;
-    cursor: pointer;
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
-}
-.button:hover, .small_button:hover {
+.small_button:hover {
     border-color: #9e9e9e;
     text-decoration: none;
 }
-.button.grey {
-    background-position: 0px 0px
-}
-.button.orange {
-    background-position: 0px -29px
-}
-.button.red {
-    background-position: 0px -58px;
-    color: #fff;
-}
-.button.yellow {
-    background-position: 0px -145px
-}
-.button.green {
-    color: #fff;
-    background-position: 0px -87px;
-    text-shadow: 0px 0px 1px #777;
-}
-.button.blue {
-    background-position: 0px -116px;
-    color: #fff;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    text-shadow: 0px 0px 1px #333;
-    border-color: #4891dc;
-}
-.button.blue:hover, .medium_button.blue:hover {
-    -webkit-box-shadow: 0px 0px 3px #999;
-    -moz-box-shadow: 0px 0px 3px #999;
-    box-shadow: 0px 0px 3px #999;
-}
-.button span {
-    background: url("images/button_icons-d4cd410000ba2f698a55dfe8bc63ed16.png") no-repeat top left;
-    display: block;
-    width: 13px;
-    height: 12px;
-    float: left;
-    margin: 2px 5px 0px 0px;
-}
-.button.plus span {
-    background-position: 0px 0px
-}
-.button.checked span {
-    background-position: 0px -12px
-}
-.button.remove span {
-    background-position: 0px -24px
-}
-.medium_button {
-    font-size: 10px;
-    padding: 6px 10px 6px 10px;
-    color: #666;
-    position: relative;
-    background: url("https://d3l0iz7q6gnphu.cloudfront.net/assets/buttons/buttons-medium-77d5bb5fc5a7dc73870efaa49f9ed124.png") repeat-x top left;
-}
-input.medium_button {
-    padding: 5px 10px 5px 10px
-}
-.medium_button.blue {
-    color: #fff;
-    border: 1px solid #4891dc;
-    box-shadow: inset 0px 0px 2px #49c6f5;
-    -webkit-box-shadow: 0px 0px 1px #49c6f5;
-    -moz-box-shadow: 0px 0px 1px #49c6f5;
-    text-shadow: 0px 0px 1px #333;
-}
-.medium_button.blue:hover {
-    text-decoration: none
-}
-.medium_button.green {
-    color: #fff;
-    border: 1px solid #5ea831;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    text-shadow: 0px 0px 1px #333;
-    background-position: 0px -25px;
-}
-.medium_button.red {
-    color: #fff;
-    text-shadow: 0px 0px 1px #333;
-    background-position: 0px -50px;
-}
-.medium_button.gray {
-    background-position: 0px -75px
-}
 .small_button {
     height: 21px;
-    background: url("https://d3l0iz7q6gnphu.cloudfront.net/assets/buttons/buttons-small-2849330262baaa38eaaecf2bc7d8146b.png") repeat-x top left;
+    background: url("images/buttons-small.png") repeat-x top left;
     font-size: 10px;
     padding: 3px 10px 3px 10px;
     color: #666;
     position: relative;
-}
-.small_button.blue {
-    background-position: 0px -21px;
-    color: #fff;
-    text-shadow: 0px 0px 1px #333;
-    border-color: #4891dc;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-}
-.small_button.blue:hover {
-    border-color: #254c74
-}
-.small_button.red {
-    background-position: 0px -41px;
-    color: #fff;
-    border-color: #aaa;
 }
 .small_button.left_half {
     -webkit-border-top-right-radius: 0px;

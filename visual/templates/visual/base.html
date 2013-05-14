@@ -4,11 +4,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>dataRonin</title>
+<title>{% block title %}dataRonin{% endblock %}</title>
 <meta name="keywords" content="" />
 <meta name="description" content="" />
 <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700|Archivo+Narrow:400,700" />
 <link rel="stylesheet" type="text/css" href="{% static 'visual/style.css' %}" />
+{% block headers %}{% endblock %}
 </head>
 <body>
 <div class="wrapper">
@@ -18,6 +19,7 @@
 				<h1><a href="index.html"><img src="{% static 'visual/images/dataronin_new.png' %}" alt="dataRonin" /></a></h1>
 			</div>	
 			<div id="menu">
+				{% block menu %}
 				<ul>
 					<li class="has-sub"><a href="#"><span>Vitae</span></a>
 						<ul>
@@ -51,12 +53,15 @@
 					</li>
 					<li><a href="about.html">About Fox</a></li>					
 				</ul>
+				{% endblock %}
 			</div>
 		</div>
 	</div>
 	<div id="banner-wrapper">
+	{% block banner %}{% endblock %}
 	</div>
 
+	{% block content %}
 	<div id="plotter_page" class="container">
 		<div id="leftbar">
 			<div id="fetch_data">
@@ -109,11 +114,14 @@
 		</div>
 		<div id="plotter">
 		</div>
+	{% endblock %}
 	</div>
 	<div class="push"></div>
 </div>
 <div id="footer">
-	<p>Copyright &copy; 2013 <a href="mailto:fox.peterson@oregonstate.edu">Fox Peterson</a>.  All rights reserved.<br />Design by <a href="http://www.tinybike.com">Tinybike Interactive</a>.  Plots created with <a href="http://www.flotcharts.org/">Flot</a>.</p>
+	{% block footer %}
+	<p>Copyright &copy; 2013 <a href="mailto:fox.peterson@oregonstate.edu">Fox Peterson</a>.  All rights reserved.<br />Design by <a href="http://www.tinybike.com">Tinybike Interactive</a>.</p>
+	{% endblock %}
 </div>
 </body>
 </html>

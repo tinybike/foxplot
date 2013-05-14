@@ -1,0 +1,55 @@
+{% extends "visual/base_visual.html" %}
+
+{% block fetchplot %}
+<div id="leftbar">
+	<div id="fetch_data">
+		<form action="/visual/results/" method="post">
+		{% csrf_token %}
+		<div id="bio_or_npp">
+			<ul>
+				<li>
+				<input type="radio" name="bio_or_npp" value="biomass" {% if bio_or_npp == 'biomass' %}checked="checked"{% endif %} /> Biomass
+				<input type="radio" name="bio_or_npp" value="npp" {% if bio_or_npp == 'npp' %}checked="checked"{% endif %} /> NPP
+				</li>
+			</ul>
+		</div>
+		<p class="boxheader">Time series</p>
+		<ul>
+			<li>
+			Statistic:&nbsp;&nbsp;
+			<select name="select_stat" id="select_stat">
+				<option value="mean" {% if select_stat == 'mean' %}selected="selected"{% endif %}>mean</option>
+				<option value="median" {% if select_stat == 'median' %}selected="selected"{% endif %}>median</option>
+				<option value="quartile_1" {% if select_stat == 'quartile_1' %}selected="selected"{% endif %}>1st quartile</option>
+				<option value="quartile_3" {% if select_stat == 'quartile_3' %}selected="selected"{% endif %}>3rd quartile</option>
+				<option value="max" {% if select_stat == 'max' %}selected="selected"{% endif %}>maximum</option>
+				<option value="min" {% if select_stat == 'min' %}selected="selected"{% endif %}>minimum</option>
+			</select>
+			</li>
+			<li>
+			Period:&nbsp;&nbsp;
+			<select name="select_span" id="select_span">
+				<option value="year" {% if select_span == 'year' %}selected="selected"{% endif %}>year</option>
+				<option value="month" {% if select_span == 'month' %}selected="selected"{% endif %}>month/season</option>
+			</select>
+			</li>
+			<li><input type="checkbox" value="Yes" name="show_errors" id="show_errors" {% if show_errors %}checked="checked"{% endif %} /> Error bars</li>
+			<li><input type="checkbox" value="Yes" name="log_y" id="log_y" {% if log_y %}checked="checked"{% endif %}/> Log-transform</li>
+			<li><input type="checkbox" value="Yes" name="align_start" id="align_start" {% if align_start %}checked="checked"{% endif %}/> Align start times</li>
+		</ul>
+		<p class="boxheader">Histogram</p>
+		<ul>
+		<li>Number of bins:&nbsp;&nbsp;<input type="text" size="1" value="25" name="num_bins" id="num_bins" /></li>
+		<li><input type="checkbox" value="Yes" name="hist_show_errors" id="hist_show_errors" {% if hist_show_errors %}checked="checked"{% endif %}/> Error bars</li>
+		<li><input type="checkbox" value="Yes" name="hist_log_x" id="hist_log_x" {% if hist_log_x %}checked="checked"{% endif %}/> Log-transform x-axis</li>
+		<li><input type="checkbox" value="Yes" name="hist_log_y" id="hist_log_y" {% if hist_log_y %}checked="checked"{% endif %}/> Log-transform y-axis</li>
+		</ul>
+		<div id="data_button">
+			<input class="small_button" type="submit" value="Get data" />
+		</div>
+		</form>
+	</div>
+</div>
+<div id="plotter">
+</div>
+{% endblock %}

@@ -1,12 +1,8 @@
+{% extends "visual/base_visual.html" %}
+
 {% load staticfiles %}
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>dataRonin</title>
-<meta name="keywords" content="" />
-<meta name="description" content="" />
+{% block headers %}
 <!--[if lte IE 8]><script src="{% static 'visual/js/excanvas.min.js' %}"></script><![endif]-->
 <script src="{% static 'visual/js/jquery.js' %}"></script>
 <script src="{% static 'visual/js/jquery.flot.js' %}"></script>
@@ -405,103 +401,59 @@ $(function() {
 	});
 });
 </script>
-<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700|Archivo+Narrow:400,700" />
-<link rel="stylesheet" type="text/css" href="{% static 'visual/style.css' %}" />
-</head>
-<body>
-<div class="wrapper">
-	<div id="header-wrapper">
-		<div id="header" class="container">
-			<div id="logo">
-				<h1><a href="index.html"><img src="{% static 'visual/images/dataronin_new.png' %}" alt="dataRonin" /></a></h1>
-			</div>	
-			<div id="menu">
-				<ul>
-					<li class="has-sub"><a href="#"><span>Vitae</span></a>
-						<ul>
-							<li><a href="cv.html"><span>CV</span></a></li>
-							<li><a href="publications.html"><span>Publications</span></a></li>
-						</ul>
-					</li>
-					<li class="has-sub"><a href="#"><span>Research</span></a>
-						<ul>
-							<li><a href="topics.html"><span>Topics</span></a></li>
-							<li><a href="instrumentation.html"><span>Instrumentation</span></a></li>
-							<li><a href="data.html"><span>Data Analysis</span></a></li>
-							<li><a href="field.html"><span>Field Experiences</span></a></li>
-							<li><a href="soil.html"><span>Soil Laboratory</span></a></li>
-						</ul>
-					</li>
-					<li class="has-sub"><a href="#">Images</a>
-						<ul>
-							<li><a href="instruments.html">Instruments</a></li>
-							<li><a href="fieldsites.html">Field sites</a></li>
-							<li><a href="other.html">Other</a></li>
-							<li><a href="video.html">Video</a></li>
-						</ul>
-					</li>
-					<li class="has-sub"><a href="#">Links</a>
-						<ul>
-							<li><a href="http://andrewsforest.oregonstate.edu">H.J. Andrews</a></li>
-							<li><a href="http://www.tinybike.com">Tinybike</a></li>
-							<li><a href="http://www.science.oregonstate.edu/~lajthak/">Kate Lajtha</a></li>
-						</ul>
-					</li>
-					<li><a href="about.html">About Fox</a></li>					
-				</ul>
-			</div>
-		</div>
-	</div>
-	<div id="banner-wrapper">
-		<center>
-		<div class="summary-container">
-			{% if bio_or_npp == 'npp' %}
-				<div id="total_summary" style="width: 80%;">
-			{% else %}
-				<div id="total_summary" style="width: 50%;">
-			{% endif %}
-			{% for field, total_summary in summary %}
-				{% if forloop.counter == 2 and bio_or_npp == 'biomass' %}
-					<table id="table-3">
-				{% else %}
-					<table id="table-{{ forloop.counter }}">
-				{% endif %}
-				<tr>
-				{% if forloop.counter == 1 %}
-					<td><span style="font-size: 105%; padding-right: 25px; border-right: 1px solid #777; border-bottom: 1px solid #777;">{{ bio_or_npp_label|safe }}</span></td>
-				{% else %}
-					<th></th>
-				{% endif %}
-				<th><span class="statistic_header">{{ field }}</span></th>
-				</tr>
-				{% for stat, mean, std in total_summary %}
-					<tr>
-					{% if forloop.parentloop.counter == 1 %}
-						<td class="statistic"><span class="statistic">{{ stat }}</span></td>
-					{% else %}
-						<td>&nbsp;</td>
-					{% endif %}
-					<td class="data">{{ mean }} &plusmn; {{ std }}</td>
-					</tr>
-				{% endfor %}
-				</table>
-				{% if forloop.counter == 2 and bio_or_npp == 'biomass' %}
-					<table id="table-2">
-						<tr><td></td><th><span class="statistic_header">&nbsp;</span></th></tr>
-						<tr><td class="data">&nbsp;</td></tr>
-						<tr><td class="data">&nbsp;</td></tr>
-						<tr><td class="data">&nbsp;</td></tr>
-						<tr><td class="data">&nbsp;</td></tr>
-						<tr><td class="data">&nbsp;</td></tr>
-						<tr><td class="data">&nbsp;</td></tr>
-					</table>
-				{% endif %}
-			{% endfor %}
-			</div>
-		</div>
-		</center>
-	</div>
+{% endblock %}
 
+{% block banner %}
+<center>
+<div class="summary-container">
+	{% if bio_or_npp == 'npp' %}
+		<div id="total_summary" style="width: 80%;">
+	{% else %}
+		<div id="total_summary" style="width: 50%;">
+	{% endif %}
+	{% for field, total_summary in summary %}
+		{% if forloop.counter == 2 and bio_or_npp == 'biomass' %}
+			<table id="table-3">
+		{% else %}
+			<table id="table-{{ forloop.counter }}">
+		{% endif %}
+		<tr>
+		{% if forloop.counter == 1 %}
+			<td><span style="font-size: 105%; padding-right: 25px; border-right: 1px solid #777; border-bottom: 1px solid #777;">{{ bio_or_npp_label|safe }}</span></td>
+		{% else %}
+			<th></th>
+		{% endif %}
+		<th><span class="statistic_header">{{ field }}</span></th>
+		</tr>
+		{% for stat, mean, std in total_summary %}
+			<tr>
+			{% if forloop.parentloop.counter == 1 %}
+				<td class="statistic"><span class="statistic">{{ stat }}</span></td>
+			{% else %}
+				<td>&nbsp;</td>
+			{% endif %}
+			<td class="data">{{ mean }} &plusmn; {{ std }}</td>
+			</tr>
+		{% endfor %}
+		</table>
+		{% if forloop.counter == 2 and bio_or_npp == 'biomass' %}
+			<table id="table-2">
+				<tr><td></td><th><span class="statistic_header">&nbsp;</span></th></tr>
+				<tr><td class="data">&nbsp;</td></tr>
+				<tr><td class="data">&nbsp;</td></tr>
+				<tr><td class="data">&nbsp;</td></tr>
+				<tr><td class="data">&nbsp;</td></tr>
+				<tr><td class="data">&nbsp;</td></tr>
+				<tr><td class="data">&nbsp;</td></tr>
+			</table>
+		{% endif %}
+	{% endfor %}
+	</div>
+</div>
+</center>
+{% endblock %}
+
+{% block fetchplot %}
 	<div id="plotter_page" class="container">
 		<div id="leftbar">
 			<div id="fetch_data">
@@ -517,19 +469,6 @@ $(function() {
 				</div>
 				<p class="boxheader">Time series</p>
 				<ul>
-					<!---<li>
-						Dataset:
-						<select name="dataset" id="dataset">
-							<option value="bio">bio</option>
-							<option value="bio_all">bio_all</option>
-							<option value="gro">gro</option>
-							<option value="anpp">anpp</option>
-							<option value="npp_wet">npp_wet</option>
-						</select>
-					</li>
-					<li><input type="checkbox" value="Yes" name="get_summary" id="get_summary" />Get summary statistics</li>
-					<li><input type="checkbox" value="Yes" name="get_histogram" id="get_histogram" checked="checked" />Get histogram</li>
-					<li><input type="checkbox" value="Yes" name="get_time_series" id="get_time_series" checked="checked" />Get time series</li>--->
 					<li>
 					Statistic:&nbsp;&nbsp;
 					<select name="select_stat" id="select_stat">
@@ -555,15 +494,6 @@ $(function() {
 				<p class="boxheader">Histogram</p>
 				<ul>
 				<li>Number of bins:&nbsp;&nbsp;<input type="text" size="1" value="25" name="num_bins" id="num_bins" /></li>
-				<!---<li>
-				Plot type:&nbsp;&nbsp;
-				<select name="plot_type" id="plot_type">
-					<option value="points">points</option>
-					<option value="bars">bars</option>
-					<option value="lines">lines</option>
-					<option value="pointslines">points + lines</option>
-				</select>
-				</li>--->
 				<li><input type="checkbox" value="Yes" name="hist_show_errors" id="hist_show_errors" {% if hist_show_errors %}checked="checked"{% endif %}/> Error bars</li>
 				<li><input type="checkbox" value="Yes" name="hist_log_x" id="hist_log_x" {% if hist_log_x %}checked="checked"{% endif %}/> Log-transform x-axis</li>
 				<li><input type="checkbox" value="Yes" name="hist_log_y" id="hist_log_y" {% if hist_log_y %}checked="checked"{% endif %}/> Log-transform y-axis</li>
@@ -578,27 +508,10 @@ $(function() {
 			</div>
 		</div>
 		<div id="plotter">
-			<!---{% if get_summary %}
-				<p class="announce">Summary statistics</p>
-				<ul>
-				{% for stat, value in summary %}
-					<li>{{ stat }}: {{ value }}</li>
-				{% endfor %}
-				</ul>
-			{% endif %}--->
-			<!---<p class="announce">Time series</p>--->
 			<div class="flot-container">
 				<div id="histogram_placeholder" class="flot-placeholder"></div>
 				<div id="time_series_placeholder" class="flot-placeholder"></div>
 			</div>
-			<!---<image id="theimage"></image>
-			<a href="#" onclick="toImage()">save</a>--->
 		</div>
 	</div>
-	<div class="push"></div>
-</div>
-<div id="footer">
-	<p>Copyright &copy; 2013 <a href="mailto:fox.peterson@oregonstate.edu">Fox Peterson</a>.  All rights reserved.<br />Design by <a href="http://www.tinybike.com">Tinybike Interactive</a>.  Plots created with <a href="http://www.flotcharts.org/">Flot</a>.</p>
-</div>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "visual/base.html" %}
+
+{% block title %}dataRonin visualization{% endblock %}
+
+{% block content %}
+<div id="plotter_page" class="container">
+	{% block fetchplot %}
+	{% endblock %}
+</div>
+{% endblock %}
+{% block footer %}
+<p>Copyright &copy; 2013 <a href="mailto:fox.peterson@oregonstate.edu">Fox Peterson</a>.  All rights reserved.<br />Design by <a href="http://www.tinybike.com">Tinybike Interactive</a>.  Plots created with <a href="http://www.flotcharts.org/">Flot</a>.</p>
+{% endblock %}

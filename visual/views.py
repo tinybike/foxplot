@@ -177,4 +177,4 @@ def results(request):
 	})
 
 def index(request):
-	return render(request, 'visual/index.html')
+	return render(request, 'visual/fetch.html')
