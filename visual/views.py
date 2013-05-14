@@ -176,5 +176,5 @@ def results(request):
 		'json_histogram_3': json.dumps(json_histogram_3),
 	})
 
-def index(request):
+def fetch(request):
 	return render(request, 'visual/fetch.html')
