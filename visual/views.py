@@ -178,3 +178,6 @@ def results(request):
 
 def fetch(request):
 	return render(request, 'visual/fetch.html')
+
+def base(request):
+	return render(request, 'base.html')

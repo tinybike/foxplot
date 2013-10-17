@@ -6,4 +6,6 @@ urlpatterns = patterns('',
 	url(r'^$', views.fetch, name='fetch'),
 	# ex: /visual/results/
 	url(r'^results/$', views.results, name='results'),
+    # ex: /visual/base/
+    url(r'^base/$', views.base, name='base'),
 )
