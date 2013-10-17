@@ -153,7 +153,7 @@ $(function() {
 	}
 	
 	{% if bio_or_npp == 'biomass' %}
-		tsYAxisLabel = 'g/m2';
+		tsYAxisLabel = 'g/m<sup>2</sup>';
 	{% else %}
 		tsYAxisLabel = 'g/m<sup>2</sup>/year';
 	{% endif %}
@@ -285,7 +285,7 @@ $(function() {
 	};
 	
 	{% if bio_or_npp == 'biomass' %}
-		histXAxisLabel = 'g/m2';
+		histXAxisLabel = 'g/m<sup>2</sup>';
 	{% else %}
 		histXAxisLabel = 'g/m<sup>2</sup>/year';
 	{% endif %}
